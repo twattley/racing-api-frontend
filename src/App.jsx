@@ -1,24 +1,29 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import { Login } from "./components/Login";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Home } from "./components/Home";
-import { FeedBackResultsData } from "./components/feedback/FeedBackResults";
+import { Landing } from "./components/Landing";
+import { NavBar } from "./components/NavBar";
 import { FeedBackRaceTimes } from "./components/feedback/FeedBackRaces";
-import { AccessibleTable } from "./components/AccessibleTable";
-import { DessertDetail } from "./components/DessertDetail"; // Import the new DessertDetail component
-import { FoodTypeDetail } from "./components/FoodTypeDetail"; // Import the new FoodTypeDetail component
+import { FeedbackRaceDetails } from "./components/feedback/FeedbachRaceDetails";
+import { TodaysRaceTimes } from "./components/today/TodaysRaces";
+import { TomorrowsRaceTimes } from "./components/tomorrow/TomorrowsRaces";
+
+
 
 function App() {
+  const location = useLocation();
+
   return (
-    <div>
+    <div className="App">
+      {location.pathname !== "/" && location.pathname !== "/home" && <NavBar />}
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/feedback/races" element={<FeedBackRaceTimes />} />
-        <Route path="/feedback/results" element={<FeedBackResultsData />} />
-        <Route path="/table" element={<AccessibleTable />} />
-        <Route path="/dessert/:id" element={<DessertDetail />} />{" "}
-        <Route path="/food_type/:id" element={<FoodTypeDetail />} />{" "}
+        <Route path="/feedback" element={<FeedBackRaceTimes />} />
+        <Route path="/race/:race_id" element={<FeedbackRaceDetails />} />
+        <Route path="/today" element={<TodaysRaceTimes />} />
+        <Route path="/tomorrow" element={<TomorrowsRaceTimes />} />
+        {/* Add other routes here if needed */}
       </Routes>
     </div>
   );

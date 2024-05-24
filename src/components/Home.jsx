@@ -1,24 +1,20 @@
-import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
+
 
 export function Home() {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
-  const handleFeedback = () => {
-    navigate("/feedback/races");
-  }
-
+  const button = "w-180 p-12 bg-gray-200 rounded shadow-lg text-6xl font-semibold text-center";
   return (
-    <div>
-      <h1>Welcome to the Home Page!</h1>
-      <button onClick={handleFeedback}>Feedback</button>
-      <button onClick={handleLogout}>Log Out</button>
+    <div className="flex flex-col items-center justify-center h-screen space-y-6">
+      <Link to="/today" className={button}>
+        Today
+      </Link>
+      <Link to="/tomorrow" className={button}>
+        Tomorrow
+      </Link>
+      <Link to="/feedback" className={button}>
+        Feedback
+      </Link>
     </div>
   );
 }

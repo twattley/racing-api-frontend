@@ -1,11 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
-export function useFetch(url, options = {}) {
+export function useFetch(endpoint, options = {}) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const { authToken } = useAuth();
+
+  const url = useMemo(
+    () => `${import.meta.env.VITE_API_BASE_URL}${endpoint}`,
+    [endpoint]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +44,7 @@ export function useFetch(url, options = {}) {
     };
 
     fetchData();
-  }, [url, options, authToken]);
+  }, [url, authToken]);
 
   return { data, error, loading };
 }
