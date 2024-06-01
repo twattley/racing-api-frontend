@@ -1,23 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
-export function useFetch(endpoint, options = {}) {
+export function usePost(endpoint, options = {}) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { authToken } = useAuth();
 
-  const url = useMemo(
-    () => (endpoint ? `${import.meta.env.VITE_API_BASE_URL}${endpoint}` : null),
-    [endpoint]
-  );
+  const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}`;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!url) {
-        setLoading(false);
-        return;
-      }
+  const postData = useCallback(
+    async (body) => {
+      setLoading(true);
+      setError(null);
 
       if (!authToken) {
         console.log("No auth token available.");
@@ -27,11 +22,14 @@ export function useFetch(endpoint, options = {}) {
 
       try {
         const response = await fetch(url, {
+          method: "POST",
           ...options,
           headers: {
+            "Content-Type": "application/json",
             ...options.headers,
             Authorization: `Bearer ${authToken}`,
           },
+          body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -42,14 +40,13 @@ export function useFetch(endpoint, options = {}) {
         setData(result);
       } catch (error) {
         setError(error);
-        console.error("Failed to fetch data:", error);
+        console.error("Failed to post data:", error);
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [url, authToken, options]
+  );
 
-    fetchData();
-  }, [url, authToken]);
-
-  return { data, error, loading };
+  return { data, error, loading, postData };
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { useFetch } from "../../hooks/useFetch";
 
-export function FeedBackResultsData() {
+export function FeedbackRaceResult() {
   const { data, error, loading } = useFetch(
     "http://localhost:8000/racing-api/api/v1/feedback/todays-races/result/by-race-id?date=2023-01-01&race_id=827248"
   );
