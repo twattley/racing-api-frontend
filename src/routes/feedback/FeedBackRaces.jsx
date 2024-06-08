@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
-import { Link } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
 import { usePost } from "../../hooks/usePost";
 import { RaceDatePicker } from "../../components/feedback/RaceDatePicker";
+import { TodaysRaceTimes } from "../../components/TodaysRaces";
 
-export function FeedBackRaceTimes() {
+export function FeedBackRaces() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [visibleCourses, setVisibleCourses] = useState({});
 
@@ -30,7 +30,7 @@ export function FeedBackRaceTimes() {
     : null;
 
   const {
-    data: feedbackData, 
+    data: feedbackData,
     error: feedbackDataError,
     loading: feedbackDataLoading,
   } = useFetch(endpoint, { dependencies: [endpoint] });
@@ -54,7 +54,11 @@ export function FeedBackRaceTimes() {
     }
   }, [feedbackData]);
 
-
+  useEffect(() => {
+    if (formattedDate) {
+      postData({ date: formattedDate });
+    }
+  }, [formattedDate]);
 
   const toggleCourseVisibility = (courseIndex) => {
     setVisibleCourses((prevState) => ({
@@ -86,55 +90,12 @@ export function FeedBackRaceTimes() {
   return (
     <div className="container mx-auto p-4">
       <RaceDatePicker onDateChange={setSelectedDate} />
-      {feedbackData.map((raceDay, index) => (
-        <div
-          key={index}
-          className="race-day mb-6 p-4 bg-white shadow-md rounded"
-        >
-          <h2 className="race-date text-2xl font-bold mb-4">
-            {new Date(raceDay.race_date).toDateString()}
-          </h2>
-
-          {raceDay.courses.map((course, courseIndex) => (
-            <div key={courseIndex} className="course mb-4">
-              <h3
-                className="course-name text-xl font-semibold mb-2 cursor-pointer"
-                onClick={() => toggleCourseVisibility(courseIndex)}
-              >
-                {course.course}
-              </h3>
-
-              {visibleCourses[courseIndex] && (
-                <div className="race-list ml-6">
-                  {course.races.map((race) => (
-                    <div key={race.race_id} className="group relative mb-1">
-                      <Link
-                        to={`/race/${race.race_id}`}
-                        className="text-lg text-gray-600 group-hover:text-blue-500 hover:no-underline"
-                      >
-                        {race.race_title}
-                      </Link>
-                      <div
-                        className="hidden group-hover:block absolute z-10 bg-white p-2 rounded shadow-lg top-full left-0 w-64 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                        style={{ transitionDelay: "200ms" }} // Add 200ms delay
-                      >
-                        {/* Add more details about the race here */}
-                        <p>Class: {race.race_class}</p>
-                        <p>Distance: {race.distance}</p>
-                        <p>Runners: {race.number_of_runners}</p>
-                        <p>Prize: {race.total_prize_money}K</p>
-                        <p>Going: {race.going}</p>
-                        {/* ... other details ... */}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
+      <TodaysRaceTimes
+        todaysRaceDataType="feedback"
+        todaysRaceData={feedbackData}
+        visibleCourses={visibleCourses}
+        toggleCourseVisibility={toggleCourseVisibility}
+      />
     </div>
   );
-
-                  }
+}

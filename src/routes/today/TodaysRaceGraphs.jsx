@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
-import { FeedbackTabs } from "../../components/feedback/Tabs";
+import { TodaysTabs } from "../../components/today/Tabs";
 import { RaceGraph } from "../../components/Graph";
 
-export function FeedbackRaceGraphs() {
+export function TodaysRaceGraphs() {
   const { race_id } = useParams();
   const {
     data: graphData,
@@ -24,7 +24,7 @@ export function FeedbackRaceGraphs() {
 
   return (
     <div className="container mx-auto p-4">
-      <FeedbackTabs race_id={race_id} />
+      <TodaysTabs race_id={race_id} />
       <div className="mb-4 pt-4">
         <label htmlFor="filter" className="mr-2 font-bold">
           Select Variable:

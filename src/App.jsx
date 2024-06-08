@@ -3,12 +3,13 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Home } from "./components/Home";
 import { Landing } from "./components/Landing";
 import { NavBar } from "./components/NavBar";
-import { FeedBackRaceTimes } from "./routes/feedback/FeedBackRaces";
+import { FeedBackRaces } from "./routes/feedback/FeedBackRaces";
 import { FeedbackRaceDetails } from "./routes/feedback/FeedbackRaceDetails";
-import { TodaysRaceTimes } from "./components/today/TodaysRaces";
-import { TomorrowsRaceTimes } from "./components/tomorrow/TomorrowsRaces";
 import { FeedbackRaceGraphs } from "./routes/feedback/FeedbackRaceGraphs";
 import { FeedbackRaceResult } from "./routes/feedback/FeedbackRaceResult";
+import { TodaysRaces } from "./routes/today/TodaysRaces";
+import { TodaysRaceDetails } from "./routes/today/TodaysRaceDetails";
+import { TodaysRaceGraphs } from "./routes/today/TodaysRaceGraphs";
 
 
 
@@ -21,13 +22,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/feedback" element={<FeedBackRaceTimes />} />
-        <Route path="/race/:race_id" element={<FeedbackRaceDetails />} />
-        <Route path="/race/:race_id/graphs" element={<FeedbackRaceGraphs />} />
-        <Route path="/race/:race_id/result" element={<FeedbackRaceResult />} />
-        <Route path="/today" element={<TodaysRaceTimes />} />
-        <Route path="/tomorrow" element={<TomorrowsRaceTimes />} />
-        {/* Add other routes here if needed */}
+        <Route path="/feedback" element={<FeedBackRaces />} />
+        <Route path="/feedback_race/:race_id" element={<FeedbackRaceDetails />} />
+        <Route path="/feedback_race/:race_id/graphs" element={<FeedbackRaceGraphs />} />
+        <Route path="/feedback_race/:race_id/result" element={<FeedbackRaceResult />} />
+        <Route path="/today" element={<TodaysRaces />} />
+        <Route path="/todays_race/:race_id" element={<TodaysRaceDetails />} />
+        <Route path="/todays_race/:race_id/graphs" element={<TodaysRaceGraphs />} />
       </Routes>
     </div>
   );

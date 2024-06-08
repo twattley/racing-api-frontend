@@ -1,12 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-export function FeedbackTabs({ race_id }) {
+export function TodaysTabs({ race_id }) {
   return (
     <div className="container mx-auto p-4">
       <div className="tabs flex justify-start bg-white border-b border-gray-300 pb-4">
         <NavLink
-          to={`/feedback_race/${race_id}/`}
+          to={`/todays_race/${race_id}/`}
           className={({ isActive }) =>
             `tab px-4 py-2 mx-2 text-lg font-bold border-b-2 ${
               isActive
@@ -18,7 +18,7 @@ export function FeedbackTabs({ race_id }) {
           Form Data
         </NavLink>
         <NavLink
-          to={`/feedback_race/${race_id}/graphs`}
+          to={`/todays_race/${race_id}/graphs`}
           className={({ isActive }) =>
             `tab px-4 py-2 mx-2 text-lg font-bold border-b-2 ${
               isActive
@@ -28,18 +28,6 @@ export function FeedbackTabs({ race_id }) {
           }
         >
           Graphs
-        </NavLink>
-        <NavLink
-          to={`/feedback_race/${race_id}/result`}
-          className={({ isActive }) =>
-            `tab px-4 py-2 mx-2 text-lg font-bold border-b-2 ${
-              isActive
-                ? "border-gray-800 text-gray-800"
-                : "border-transparent text-gray-600"
-            } hover:text-gray-800`
-          }
-        >
-          Result
         </NavLink>
       </div>
     </div>
