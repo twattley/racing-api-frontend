@@ -10,7 +10,7 @@ export function TodaysRaceGraphs() {
     data: graphData,
     error: graphDataError,
     loading: graphDataLoading,
-  } = useFetch(`/feedback/todays-races/graph/by-race-id?race_id=${race_id}`);
+  } = useFetch(`/today/todays-races/graph/by-race-id?race_id=${race_id}`);
 
   const [filter, setFilter] = useState("official_rating");
 

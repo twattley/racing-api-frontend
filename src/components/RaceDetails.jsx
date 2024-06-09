@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 export function RaceDetails({ formData, formDataError, formDataLoading }) {
-
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: "ascending",
@@ -60,9 +59,11 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
     <div className="container mx-auto p-4">
       {formData && (
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">Race Details</h1>
           <p>
             <strong>Course:</strong> {formData.course}
+          </p>
+          <p>
+            <strong>Race Title:</strong> {formData.race_title}
           </p>
           <p>
             <strong>Distance:</strong> {formData.distance}
@@ -71,31 +72,13 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
             <strong>Going:</strong> {formData.going}
           </p>
           <p>
-            <strong>Surface:</strong> {formData.surface}
-          </p>
-          <p>
             <strong>Race Class:</strong> {formData.race_class}
           </p>
           <p>
             <strong>Handicap Range:</strong> {formData.hcap_range}
           </p>
           <p>
-            <strong>Age Range:</strong> {formData.age_range}
-          </p>
-          <p>
             <strong>Conditions:</strong> {formData.conditions}
-          </p>
-          <p>
-            <strong>Race Type:</strong> {formData.race_type}
-          </p>
-          <p>
-            <strong>Race Title:</strong> {formData.race_title}
-          </p>
-          <p>
-            <strong>Race Time:</strong> {formData.race_time}
-          </p>
-          <p>
-            <strong>Race Date:</strong> {formData.race_date}
           </p>
         </div>
       )}
@@ -121,36 +104,20 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                 <table className="min-w-full border-collapse">
                   <thead>
                     <tr className="bg-gray-800 text-white">
-                      <th
-                        className="px-4 py-2 text-left cursor-pointer"
-                        onClick={() => onSort("course")}
-                      >
-                        Course
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        PERFORMANCE
                       </th>
-                      <th
-                        className="px-4 py-2 text-left cursor-pointer"
-                        onClick={() => onSort("race_type")}
-                      >
-                        Race Type
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        DSP/DSLR
                       </th>
-                      <th>Distance</th>
-                      <th
-                        className="px-4 py-2 text-left cursor-pointer"
-                        onClick={() => onSort("race_class")}
-                      >
-                        Race Class
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        OR
                       </th>
-                      <th
-                        className="px-4 py-2 text-left cursor-pointer"
-                        onClick={() => onSort("days_since_last_ran")}
-                      >
-                        DSLR
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        RP-RATINGS
                       </th>
-                      <th
-                        className="px-4 py-2 text-left cursor-pointer"
-                        onClick={() => onSort("days_since_performance")}
-                      >
-                        DSP
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        TF-RATINGS
                       </th>
                     </tr>
                   </thead>
@@ -163,29 +130,33 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               index % 2 === 0 ? "bg-white" : "bg-gray-100"
                             }
                           >
-                            <td className="px-4 py-2 group relative">
-                              {performance_data.course}
-                              <div className="hidden group-hover:block absolute z-10 bg-white p-2 rounded shadow-lg top-full left-0 whitespace-nowrap">
-                                <div className="inline-block">
-                                  {performance_data.race_title}
-                                </div>
-                              </div>
-                            </td>
-
-                            <td className="px-4 py-2">
-                              {performance_data.race_type}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.distance}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.race_class || "-"}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.days_since_last_ran}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.days_since_performance}
+                            <td colSpan="11" className="px-4 py-2 text-xl">
+                              <strong>{performance_data.course}</strong> {"  "}
+                              <strong>{performance_data.distance}</strong>
+                              {"  ("}
+                              <strong>
+                                <i>{performance_data.race_class}</i>
+                              </strong>
+                              {")"}
+                              {"  ("}
+                              <strong>
+                                <i>{performance_data.going}</i>
+                              </strong>
+                              {")"}
+                              {"  ("}
+                              <strong>
+                                <i>{performance_data.total_prize_money}</i>
+                              </strong>
+                              {")"}
+                              {" - "}
+                              <span className="text-sm text-gray-500">
+                                {"("}
+                                {performance_data.race_type}
+                                {")  "}
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                {performance_data.race_title}
+                              </span>
                             </td>
                           </tr>
                           <tr
@@ -193,7 +164,42 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               index % 2 === 0 ? "bg-white" : "bg-gray-100"
                             }
                           >
-                            <td className="px-4 py-2" colSpan={6}>
+                            <td className="px-4 py-2 text-xl">
+                              {"   "}
+                              <strong>
+                                {performance_data.finishing_position}
+                              </strong>{" "}
+                              {"/"}{" "}
+                              <strong>
+                                {performance_data.number_of_runners}
+                              </strong>
+                              {"  ("}
+                              <i>{performance_data.total_distance_beaten}</i>
+                              {")"}
+                            </td>
+                            <td className="px-4 py-2">
+                              {performance_data.days_since_performance} {"/ "}
+                              {performance_data.days_since_last_ran}
+                            </td>
+
+                            <td className="px-4 py-2">
+                              {performance_data.official_rating}
+                            </td>
+                            <td className="px-4 py-2">
+                              {performance_data.ts} {"/ "}
+                              {performance_data.rpr}
+                            </td> 
+                            <td className="px-4 py-2">
+                              {performance_data.tfig} {"/ "}
+                              {performance_data.tfr}
+                            </td>
+                          </tr>
+                          <tr
+                            className={
+                              index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                            }
+                          >
+                            <td className="px-4 py-2" colSpan={5}>
                               {performance_data.main_race_comment}
                             </td>
                           </tr>
@@ -202,7 +208,7 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               index % 2 === 0 ? "bg-white" : "bg-gray-100"
                             }
                           >
-                            <td className="px-4 py-2" colSpan={6}>
+                            <td className="px-4 py-2" colSpan={5}>
                               {performance_data.tf_comment}
                             </td>
                           </tr>
@@ -218,4 +224,3 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
     </div>
   );
 }
-
