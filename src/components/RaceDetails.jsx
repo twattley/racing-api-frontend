@@ -75,9 +75,6 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
             <strong>Race Class:</strong> {formData.race_class}
           </p>
           <p>
-            <strong>Handicap Range:</strong> {formData.hcap_range}
-          </p>
-          <p>
             <strong>Conditions:</strong> {formData.conditions}
           </p>
         </div>
@@ -89,14 +86,26 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
               className="text-2xl pt-4 font-bold mb-4 cursor-pointer"
               onClick={() => toggleHorseVisibility(horse.horse_id)}
             >
-              <span className="border border-gray-300 px-2 py-1 rounded">
-                {horse.horse_name}
+              <span className="border border-gray-300 px-2 py-1 rounded ml-2">
+                {horse.horse_name} {" ("} {horse.horse_age} {")"}
               </span>
               <span className="bg-blue-200 px-2 py-1 rounded ml-2">
                 {horse.todays_betfair_win_sp}
               </span>
               <span className="bg-blue-200 px-2 py-1 rounded ml-1">
                 {horse.todays_betfair_place_sp}
+              </span>
+              <span className="bg-green-400 text-black px-2 py-1 rounded ml-2">
+                {horse.first_places}
+              </span>
+              <span className="bg-green-300 text-black px-2 py-1 rounded ml-2">
+                {horse.second_places}
+              </span>
+              <span className="bg-green-200 text-black px-2 py-1 rounded ml-2">
+                {horse.third_places}
+              </span>
+              <span className="bg-black text-white px-2 py-1 rounded ml-2">
+                {horse.number_of_runs}
               </span>
             </h2>
             {visibleHorses[horse.horse_id] && (
@@ -110,9 +119,7 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                       <th className="px-4 py-2 text-left cursor-pointer">
                         DSP/DSLR
                       </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        OR
-                      </th>
+                      <th className="px-4 py-2 text-left cursor-pointer">OR</th>
                       <th className="px-4 py-2 text-left cursor-pointer">
                         RP-RATINGS
                       </th>
@@ -135,7 +142,10 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               <strong>{performance_data.distance}</strong>
                               {"  ("}
                               <strong>
-                                <i>{performance_data.race_class}</i>
+                                <i>
+                                  {"Class "}
+                                  {performance_data.race_class}
+                                </i>
                               </strong>
                               {")"}
                               {"  ("}
@@ -145,7 +155,10 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               {")"}
                               {"  ("}
                               <strong>
-                                <i>{performance_data.total_prize_money}</i>
+                                <i>
+                                  {performance_data.total_prize_money}
+                                  {"K"}
+                                </i>
                               </strong>
                               {")"}
                               {" - "}
@@ -176,19 +189,25 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               {"  ("}
                               <i>{performance_data.total_distance_beaten}</i>
                               {")"}
+                              <span className="bg-blue-200 px-2 py-2 rounded ml-2">
+                                {performance_data.betfair_win_sp}
+                              </span>
+                              <span className="bg-blue-200 px-2 py-2 rounded ml-2">
+                                {performance_data.betfair_place_sp}
+                              </span>
                             </td>
+
                             <td className="px-4 py-2">
                               {performance_data.days_since_performance} {"/ "}
                               {performance_data.days_since_last_ran}
                             </td>
-
                             <td className="px-4 py-2">
                               {performance_data.official_rating}
                             </td>
                             <td className="px-4 py-2">
                               {performance_data.ts} {"/ "}
                               {performance_data.rpr}
-                            </td> 
+                            </td>
                             <td className="px-4 py-2">
                               {performance_data.tfig} {"/ "}
                               {performance_data.tfr}
