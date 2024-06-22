@@ -11,12 +11,18 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
   useEffect(() => {
     if (formData && Array.isArray(formData.horse_data)) {
       const initialVisibility = formData.horse_data.reduce((acc, horse) => {
-        acc[horse.horse_id] = true;
+        console.log(horse.horse_id, horse.todays_betfair_place_sp, horse);
+        acc[horse.horse_id] = !(
+          horse.todays_betfair_win_sp > 20 || 
+          horse.todays_days_since_last_ran > 100 || 
+          horse.todays_days_since_last_ran < 7
+        );
         return acc;
       }, {});
       setVisibleHorses(initialVisibility);
     }
   }, [formData]);
+
 
   const onSort = (key) => {
     let direction = "ascending";
@@ -87,7 +93,7 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
               onClick={() => toggleHorseVisibility(horse.horse_id)}
             >
               <span className="border border-gray-300 px-2 py-1 rounded ml-2">
-                {horse.horse_name} {" ("} {horse.horse_age} {")"}
+                {horse.horse_name} {'-'} {horse.todays_horse_age} {" ("} {horse.todays_official_rating} {")"}
               </span>
               <span className="bg-blue-200 px-2 py-1 rounded ml-2">
                 {horse.todays_betfair_win_sp}
