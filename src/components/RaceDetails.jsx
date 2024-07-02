@@ -13,8 +13,8 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
       const initialVisibility = formData.horse_data.reduce((acc, horse) => {
         console.log(horse.horse_id, horse.todays_betfair_place_sp, horse);
         acc[horse.horse_id] = !(
-          horse.todays_betfair_win_sp > 20 || 
-          horse.todays_days_since_last_ran > 100 || 
+          horse.todays_betfair_win_sp > 20 ||
+          horse.todays_days_since_last_ran > 100 ||
           horse.todays_days_since_last_ran < 7
         );
         return acc;
@@ -22,7 +22,6 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
       setVisibleHorses(initialVisibility);
     }
   }, [formData]);
-
 
   const onSort = (key) => {
     let direction = "ascending";
@@ -93,7 +92,8 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
               onClick={() => toggleHorseVisibility(horse.horse_id)}
             >
               <span className="border border-gray-300 px-2 py-1 rounded ml-2">
-                {horse.horse_name} {'-'} {horse.todays_horse_age} {" ("} {horse.todays_official_rating} {")"}
+                {horse.horse_name} {"-"} {horse.todays_horse_age} {" ("}{" "}
+                {horse.todays_official_rating} {")"}
               </span>
               <span className="bg-blue-200 px-2 py-1 rounded ml-2">
                 {horse.todays_betfair_win_sp}
@@ -102,13 +102,13 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                 {horse.todays_betfair_place_sp}
               </span>
               <span className="bg-green-400 text-black px-2 py-1 rounded ml-2">
-                {horse.first_places}
+                {horse.todays_first_places}
               </span>
               <span className="bg-green-300 text-black px-2 py-1 rounded ml-2">
-                {horse.second_places}
+                {horse.todays_second_places}
               </span>
               <span className="bg-green-200 text-black px-2 py-1 rounded ml-2">
-                {horse.third_places}
+                {horse.todays_third_places}
               </span>
               <span className="bg-black text-white px-2 py-1 rounded ml-2">
                 {horse.number_of_runs}
@@ -123,14 +123,23 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                         PERFORMANCE
                       </th>
                       <th className="px-4 py-2 text-left cursor-pointer">
+                        BTN
+                      </th>
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        WIN/PLACE
+                      </th>
+                      <th className="px-4 py-2 text-left cursor-pointer">
+                        IP HI/LOW
+                      </th>
+                      <th className="px-4 py-2 text-left cursor-pointer">
                         DSP/DSLR
                       </th>
                       <th className="px-4 py-2 text-left cursor-pointer">OR</th>
                       <th className="px-4 py-2 text-left cursor-pointer">
-                        RP-RATINGS
+                        SPEED-RATINGS
                       </th>
                       <th className="px-4 py-2 text-left cursor-pointer">
-                        TF-RATINGS
+                        RATINGS
                       </th>
                     </tr>
                   </thead>
@@ -185,6 +194,11 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                           >
                             <td className="px-4 py-2 text-xl">
                               {"   "}
+                              <span className="text-sm text-gray-500">
+                                {"("}
+                                {performance_data.draw}
+                                {")  "}
+                              </span>{" "}
                               <strong>
                                 {performance_data.finishing_position}
                               </strong>{" "}
@@ -192,9 +206,39 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               <strong>
                                 {performance_data.number_of_runners}
                               </strong>
-                              {"  ("}
-                              <i>{performance_data.total_distance_beaten}</i>
-                              {")"}
+                            </td>
+                            <td className="px-4 py-2">
+                              <strong
+                                className={`
+                                          ${
+                                            performance_data.total_distance_beaten >
+                                            4
+                                              ? "text-red-400"
+                                              : ""
+                                          } 
+                                          ${
+                                            performance_data.total_distance_beaten >
+                                              0 &&
+                                            performance_data.total_distance_beaten <
+                                              4
+                                              ? "text-blue-400"
+                                              : ""
+                                          }
+                                          ${
+                                            performance_data.total_distance_beaten <=
+                                            0
+                                              ? "text-green-400"
+                                              : ""
+                                          }
+                                      `}
+                              >
+                                {"  ("}
+                                <i>{performance_data.total_distance_beaten}</i>
+                                {")"}
+                              </strong>
+                            </td>
+
+                            <td>
                               <span className="bg-blue-200 px-2 py-2 rounded ml-2">
                                 {performance_data.betfair_win_sp}
                               </span>
@@ -202,7 +246,21 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                                 {performance_data.betfair_place_sp}
                               </span>
                             </td>
-
+                            <td className="px-4 py-2">
+                              <span
+                                className={`
+                                  px-2 py-2 rounded ml-2 
+                                  ${
+                                    performance_data.in_play_high === null
+                                      ? "bg-red-200"
+                                      : "bg-green-200"
+                                  }
+                                `}
+                              >
+                                {performance_data.in_play_high ??
+                                  performance_data.in_play_low}
+                              </span>
+                            </td>
                             <td className="px-4 py-2">
                               {performance_data.days_since_performance} {"/ "}
                               {performance_data.days_since_last_ran}
@@ -211,12 +269,36 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               {performance_data.official_rating}
                             </td>
                             <td className="px-4 py-2">
-                              {performance_data.ts} {"/ "}
-                              {performance_data.rpr}
+                              {performance_data.speed_figure}
+                              {performance_data.speed_rating_diff !== 0 && (
+                                <span
+                                  className={
+                                    performance_data.speed_rating_diff > 0
+                                      ? "text-green-500"
+                                      : "text-red-500"
+                                  }
+                                >
+                                  {" ("}
+                                  <i>{performance_data.speed_rating_diff}</i>
+                                  {")"}
+                                </span>
+                              )}
                             </td>
                             <td className="px-4 py-2">
-                              {performance_data.tfig} {"/ "}
-                              {performance_data.tfr}
+                              {performance_data.rating}
+                              {performance_data.rating_diff !== 0 && (
+                                <span
+                                  className={
+                                    performance_data.rating_diff > 0
+                                      ? "text-green-500"
+                                      : "text-red-500"
+                                  }
+                                >
+                                  {" ("}
+                                  <i>{performance_data.rating_diff}</i>
+                                  {")"}
+                                </span>
+                              )}
                             </td>
                           </tr>
                           <tr
@@ -224,7 +306,7 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               index % 2 === 0 ? "bg-white" : "bg-gray-100"
                             }
                           >
-                            <td className="px-4 py-2" colSpan={5}>
+                            <td className="px-4 py-2" colSpan={8}>
                               {performance_data.main_race_comment}
                             </td>
                           </tr>
@@ -233,7 +315,7 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                               index % 2 === 0 ? "bg-white" : "bg-gray-100"
                             }
                           >
-                            <td className="px-4 py-2" colSpan={5}>
+                            <td className="px-4 py-2" colSpan={8}>
                               {performance_data.tf_comment}
                             </td>
                           </tr>
