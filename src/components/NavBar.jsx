@@ -9,7 +9,7 @@ export function NavBar() {
           to="/"
           className="text-white font-semibold text-lg py-2 px-4 rounded-lg hover:text-gray-400"
         >
-          Login
+          Home
         </NavLink>
         <NavLink
           to="/today"

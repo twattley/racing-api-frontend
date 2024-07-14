@@ -1,11 +1,9 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "../contexts/AuthContext";
 
-export function usePost(endpoint, options = {}) {
+export function usePost(endpoint) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { authToken } = useAuth();
 
   const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}`;
 
@@ -14,20 +12,11 @@ export function usePost(endpoint, options = {}) {
       setLoading(true);
       setError(null);
 
-      if (!authToken) {
-        console.log("No auth token available.");
-        setLoading(false);
-        return;
-      }
-
       try {
         const response = await fetch(url, {
           method: "POST",
-          ...options,
           headers: {
             "Content-Type": "application/json",
-            ...options.headers,
-            Authorization: `Bearer ${authToken}`,
           },
           body: JSON.stringify(body),
         });
@@ -45,7 +34,7 @@ export function usePost(endpoint, options = {}) {
         setLoading(false);
       }
     },
-    [url, authToken, options]
+    [url]
   );
 
   return { data, error, loading, postData };
