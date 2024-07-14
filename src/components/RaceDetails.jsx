@@ -63,25 +63,45 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
   return (
     <div className="container mx-auto p-4">
       {formData && (
-        <div className="mb-8">
-          <p>
-            <strong>Course:</strong> {formData.course}
-          </p>
-          <p>
-            <strong>Race Title:</strong> {formData.race_title}
-          </p>
-          <p>
-            <strong>Distance:</strong> {formData.distance}
-          </p>
-          <p>
-            <strong>Going:</strong> {formData.going}
-          </p>
-          <p>
-            <strong>Race Class:</strong> {formData.race_class}
-          </p>
-          <p>
-            <strong>Conditions:</strong> {formData.conditions}
-          </p>
+        <div className="sticky top-0 z-10 bg-white shadow-md mb-4 p-2 flex gap-2 flex-wrap">
+          <div>
+            <strong>
+              <p className="pl-2 py-2 text-xl">{formData.course}</p>
+            </strong>
+          </div>
+          <div>
+            <strong>
+              <p className="py-2 text-xl">{formData.distance}</p>
+            </strong>
+          </div>
+          <div>
+            <strong>
+              <p className="py-2 text-xl">
+                {"(Class "}
+                <i>{formData.race_class}</i>
+                {")"}
+              </p>
+            </strong>
+          </div>
+          <div>
+            <strong>
+              <p className="py-2 text-xl">{formData.conditions}</p>
+            </strong>
+          </div>
+          <div>
+            <strong>
+              <p className="py-2 text-xl">
+                <i>
+                  {"("} {formData.going} {")"}
+                </i>
+              </p>
+            </strong>
+          </div>
+          <div>
+            <strong>
+              <p className="py-2 text-xl">{formData.total_prize_money}</p>
+            </strong>
+          </div>
         </div>
       )}
       {formData &&
@@ -163,9 +183,13 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
                                 </i>
                               </strong>
                               {")"}
-                              {"  ("}
+                              {""}
                               <strong>
-                                <i>{performance_data.going}</i>
+                                <i>{performance_data.conditions}</i>
+                              </strong>
+                              {" ("}
+                              <strong>
+                                <i> {performance_data.going}</i>
                               </strong>
                               {")"}
                               {"  ("}
