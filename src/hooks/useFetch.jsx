@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { useAuth } from "../contexts/AuthContext";
 
-export function useFetch(endpoint, options = {}) {
+export function useFetch(endpoint) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { authToken } = useAuth();
 
   const url = useMemo(
     () => (endpoint ? `${import.meta.env.VITE_API_BASE_URL}${endpoint}` : null),
@@ -19,19 +17,9 @@ export function useFetch(endpoint, options = {}) {
         return;
       }
 
-      if (!authToken) {
-        console.log("No auth token available.");
-        setLoading(false);
-        return;
-      }
-
       try {
         const response = await fetch(url, {
-          ...options,
-          headers: {
-            ...options.headers,
-            Authorization: `Bearer ${authToken}`,
-          },
+          headers: {},
         });
 
         if (!response.ok) {
@@ -49,7 +37,7 @@ export function useFetch(endpoint, options = {}) {
     };
 
     fetchData();
-  }, [url, authToken]);
+  }, [url]);
 
   return { data, error, loading };
 }
