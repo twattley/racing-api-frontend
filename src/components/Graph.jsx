@@ -16,7 +16,6 @@ import {
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom";
 
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -31,30 +30,35 @@ ChartJS.register(
   zoomPlugin
 );
 
+// Predefined Color Palette (Add more if needed)
+const colorPalette = [
+  "rgb(75, 192, 192)", // Green
+  "rgb(54, 162, 235)", // Blue
+  "rgb(255, 206, 86)", // Yellow
+  "rgb(153, 102, 255)", // Purple
+  "rgb(255, 159, 64)", // Orange
+  "rgb(255, 99, 132)", // Red (Moved to the end)
+];
+
 const Utils = {
   transparentize: (color, opacity) => {
     const alpha = opacity === undefined ? 0.5 : 1 - opacity;
     return color.replace("rgb", "rgba").replace(")", `, ${alpha})`);
   },
-  generateRandomColor: () => {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return `rgb(${r}, ${g}, ${b})`;
-  },
 };
 
 const generateChartData = (sampleData, filter) => {
-  const labels = [
-    ...new Set(
+  // Get all unique race dates and sort them
+  const labels = Array.from(
+    new Set(
       sampleData.flatMap((item) =>
         item.performance_data.map((data) => data.race_date)
       )
-    ),
-  ].sort((a, b) => new Date(a) - new Date(b));
+    )
+  ).sort((a, b) => new Date(a) - new Date(b));
 
   const datasets = sampleData.map((horse, index) => {
-    const color = Utils.generateRandomColor();
+    const color = colorPalette[index % colorPalette.length];
     return {
       label: horse.horse_name,
       data: labels.map((label) => {
@@ -135,4 +139,4 @@ const config = {
 export function RaceGraph({ data, filter }) {
   const chartData = generateChartData(data, filter);
   return <Line data={chartData} options={config.options} />;
-};
+}

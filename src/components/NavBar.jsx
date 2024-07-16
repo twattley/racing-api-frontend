@@ -18,12 +18,6 @@ export function NavBar() {
           Today
         </NavLink>
         <NavLink
-          to="/tomorrow"
-          className="text-white font-semibold text-lg py-2 px-4 rounded-lg hover:text-gray-400"
-        >
-          Tomorrow
-        </NavLink>
-        <NavLink
           to="/feedback"
           className="text-white font-semibold text-lg py-2 px-4 rounded-lg hover:text-gray-400"
         >
