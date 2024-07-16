@@ -10,34 +10,19 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
 
   useEffect(() => {
     if (formData && Array.isArray(formData.horse_data)) {
-      // Sort the horse data
+      // Sort the horse data based on the new initial_visibility property
       const sortedHorses = formData.horse_data.sort((horseA, horseB) => {
-        const isHorseAVisible = !(
-          horseA.todays_betfair_win_sp > 20 ||
-          horseA.todays_days_since_last_ran > 100 ||
-          horseA.todays_days_since_last_ran < 7
-        );
-        const isHorseBVisible = !(
-          horseB.todays_betfair_win_sp > 20 ||
-          horseB.todays_days_since_last_ran > 100 ||
-          horseB.todays_days_since_last_ran < 7
-        );
-
-        // Sort visible horses first
-        if (isHorseAVisible && !isHorseBVisible) return -1;
-        if (!isHorseAVisible && isHorseBVisible) return 1;
-        return 0; // Maintain order for horses with same visibility
+        if (horseA.initial_visibility && !horseB.initial_visibility) return -1;
+        if (!horseA.initial_visibility && horseB.initial_visibility) return 1;
+        return 0; // Maintain order for horses with the same visibility
       });
 
+      // Map the horse data to a visibility object
       const initialVisibility = sortedHorses.reduce((acc, horse) => {
-        console.log(horse.horse_id, horse.todays_betfair_place_sp, horse);
-        acc[horse.horse_id] = !(
-          horse.todays_betfair_win_sp > 20 ||
-          horse.todays_days_since_last_ran > 100 ||
-          horse.todays_days_since_last_ran < 7
-        );
+        acc[horse.horse_id] = horse.initial_visibility;
         return acc;
       }, {});
+
       setVisibleHorses(initialVisibility);
     }
   }, [formData]);

@@ -1,8 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
-import {RaceDetails} from "../../components/RaceDetails";
-import { FeedbackTabs } from "../../components/feedback/Tabs"; 
+import { RaceDetails } from "../../components/RaceDetails";
 
 export function FeedbackRaceDetails() {
   const { race_id } = useParams();
@@ -14,7 +13,6 @@ export function FeedbackRaceDetails() {
 
   return (
     <div>
-      <FeedbackTabs race_id={race_id} />{" "}
       <RaceDetails
         formData={formData}
         formDataError={formDataError}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
-import { FeedbackTabs } from "../../components/feedback/Tabs";
 import { RaceGraph } from "../../components/Graph";
 
 export function FeedbackRaceGraphs() {
@@ -24,7 +23,6 @@ export function FeedbackRaceGraphs() {
 
   return (
     <div className="container mx-auto p-4">
-      <FeedbackTabs race_id={race_id} />
       <div className="mb-4 pt-4">
         <label htmlFor="filter" className="mr-2 font-bold">
           Select Variable:
@@ -35,11 +33,9 @@ export function FeedbackRaceGraphs() {
           onChange={(e) => setFilter(e.target.value)}
           className="p-2 border rounded-md"
         >
-          <option value="official_rating">Official Rating</option>
-          <option value="rpr">RPR</option>
-          <option value="ts">TS</option>
-          <option value="tfr">TFR</option>
-          <option value="tfig">TFIG</option>
+          <option value="official_rating">OR</option>
+          <option value="rolling_rating">RATING</option>
+          <option value="rolling_speed_rating">SPEED</option>
         </select>
       </div>
       <RaceGraph data={graphData} filter={filter} />

@@ -3,12 +3,10 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Home } from "./components/Home";
 import { NavBar } from "./components/NavBar";
 import { FeedBackRaces } from "./routes/feedback/FeedBackRaces";
-import { FeedbackRaceDetails } from "./routes/feedback/FeedbackRaceDetails";
-import { FeedbackRaceGraphs } from "./routes/feedback/FeedbackRaceGraphs";
+import { FeedbackRaceWrapper } from "./routes/feedback/FeedbackRaceWrapper";
 import { FeedbackRaceResult } from "./routes/feedback/FeedbackRaceResult";
 import { TodaysRaces } from "./routes/today/TodaysRaces";
-import { TodaysRaceDetails } from "./routes/today/TodaysRaceDetails";
-import { TodaysRaceGraphs } from "./routes/today/TodaysRaceGraphs";
+import { TodaysRaceWrapper } from "./routes/today/TodaysRaceWrapper";
 
 function App() {
   const location = useLocation();
@@ -21,22 +19,14 @@ function App() {
         <Route path="/feedback" element={<FeedBackRaces />} />
         <Route
           path="/feedback_race/:race_id"
-          element={<FeedbackRaceDetails />}
-        />
-        <Route
-          path="/feedback_race/:race_id/graphs"
-          element={<FeedbackRaceGraphs />}
+          element={<FeedbackRaceWrapper />}
         />
         <Route
           path="/feedback_race/:race_id/result"
           element={<FeedbackRaceResult />}
         />
         <Route path="/today" element={<TodaysRaces />} />
-        <Route path="/todays_race/:race_id" element={<TodaysRaceDetails />} />
-        <Route
-          path="/todays_race/:race_id/graphs"
-          element={<TodaysRaceGraphs />}
-        />
+        <Route path="/todays_race/:race_id" element={<TodaysRaceWrapper />} />
       </Routes>
     </div>
   );
