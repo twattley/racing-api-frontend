@@ -11,6 +11,8 @@ export function FeedbackRaceGraphs() {
     loading: graphDataLoading,
   } = useFetch(`/feedback/todays-races/graph/by-race-id?race_id=${race_id}`);
 
+  console.log(graphData);
+
   const [filter, setFilter] = useState("official_rating");
 
   if (graphDataLoading) {

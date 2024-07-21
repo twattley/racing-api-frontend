@@ -7,23 +7,23 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
   });
 
   const [visibleHorses, setVisibleHorses] = useState({});
+  const [sortedHorses, setSortedHorses] = useState([]);
 
   useEffect(() => {
     if (formData && Array.isArray(formData.horse_data)) {
-      // Sort the horse data based on the new initial_visibility property
-      const sortedHorses = formData.horse_data.sort((horseA, horseB) => {
-        if (horseA.initial_visibility && !horseB.initial_visibility) return -1;
-        if (!horseA.initial_visibility && horseB.initial_visibility) return 1;
-        return 0; // Maintain order for horses with the same visibility
+      // Sort the horse data based on bf_decimal_sp_win in ascending order
+      const sorted = [...formData.horse_data].sort((horseA, horseB) => {
+        return horseA.bf_decimal_sp_win - horseB.bf_decimal_sp_win;
       });
 
       // Map the horse data to a visibility object
-      const initialVisibility = sortedHorses.reduce((acc, horse) => {
+      const initialVisibility = sorted.reduce((acc, horse) => {
         acc[horse.horse_id] = horse.initial_visibility;
         return acc;
       }, {});
 
       setVisibleHorses(initialVisibility);
+      setSortedHorses(sorted);
     }
   }, [formData]);
 
@@ -100,254 +100,372 @@ export function RaceDetails({ formData, formDataError, formDataLoading }) {
           </div>
         </div>
       )}
-      {formData &&
-        formData.horse_data.map((horse) => (
-          <div key={horse.horse_id} className="mb-8">
-            <h2
-              className="text-2xl pt-4 font-bold mb-4 cursor-pointer"
-              onClick={() => toggleHorseVisibility(horse.horse_id)}
-            >
-              <span className="border border-gray-300 px-2 py-1 rounded ml-2">
-                {horse.horse_name} {"-"} {horse.todays_horse_age} {" ("}{" "}
-                {horse.todays_official_rating} {")"}
+      {sortedHorses.length > 0 && (
+        <div className="mb-4 p-2">
+          {sortedHorses.map((horse) => (
+            <div key={horse.horse_id} className="mb-2">
+              <h2
+                className="text-2xl pt-2 font-bold mb-2 cursor-pointer"
+                onClick={() => toggleHorseVisibility(horse.horse_id)}
+              >
+                <div className="grid grid-cols-[minmax(100px,auto),80px,80px,80px,80px,80px,80px,80px,80px] gap-2">
+                  <span
+                    className={`border border-gray-300 px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.horse_name}
+                  </span>
+                  <span
+                    className={`border border-gray-300 px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_horse_age}
+                  </span>
+                  <span
+                    className={`border border-gray-300 px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_official_rating}
+                  </span>
+                  <span
+                    className={`bg-blue-200 px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_betfair_win_sp}
+                  </span>
+                  <span
+                    className={`bg-blue-200 px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_betfair_place_sp}
+                  </span>
+                  <span
+                    className={`bg-green-400 text-black px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_first_places}
+                  </span>
+                  <span
+                    className={`bg-green-300 text-black px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_second_places}
+                  </span>
+                  <span
+                    className={`bg-green-200 text-black px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.todays_third_places}
+                  </span>
+                  <span
+                    className={`bg-black text-white px-2 py-1 rounded ${
+                      !horse.initial_visibility ? "bg-red-200" : ""
+                    }`}
+                  >
+                    {horse.number_of_runs}
+                  </span>
+                </div>
+              </h2>
+            </div>
+          ))}
+        </div>
+      )}
+      {sortedHorses.map((horse) => (
+        <div key={horse.horse_id} className="mb-8">
+          <h2
+            className="text-2xl pt-4 font-bold mb-4 cursor-pointer"
+            onClick={() => toggleHorseVisibility(horse.horse_id)}
+          >
+            <div className="grid grid-cols-[minmax(100px,auto),80px,80px,80px,80px,80px,80px,80px,80px] gap-2">
+              <span
+                className={`border border-gray-300 px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
+                {horse.horse_name}
               </span>
-              <span className="bg-blue-200 px-2 py-1 rounded ml-2">
+              <span
+                className={`border border-gray-300 px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
+                {horse.todays_horse_age}
+              </span>
+              <span
+                className={`border border-gray-300 px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
+                {horse.todays_official_rating}
+              </span>
+              <span
+                className={`bg-blue-200 px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
                 {horse.todays_betfair_win_sp}
               </span>
-              <span className="bg-blue-200 px-2 py-1 rounded ml-1">
+              <span
+                className={`bg-blue-200 px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
                 {horse.todays_betfair_place_sp}
               </span>
-              <span className="bg-green-400 text-black px-2 py-1 rounded ml-2">
+              <span
+                className={`bg-green-400 text-black px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
                 {horse.todays_first_places}
               </span>
-              <span className="bg-green-300 text-black px-2 py-1 rounded ml-2">
+              <span
+                className={`bg-green-300 text-black px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
                 {horse.todays_second_places}
               </span>
-              <span className="bg-green-200 text-black px-2 py-1 rounded ml-2">
+              <span
+                className={`bg-green-200 text-black px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
                 {horse.todays_third_places}
               </span>
-              <span className="bg-black text-white px-2 py-1 rounded ml-2">
+              <span
+                className={`bg-black text-white px-2 py-1 rounded ${
+                  !horse.initial_visibility ? "bg-red-200" : ""
+                }`}
+              >
                 {horse.number_of_runs}
               </span>
-            </h2>
-            {visibleHorses[horse.horse_id] && (
-              <div className="overflow-y-auto" style={{ maxHeight: "640px" }}>
-                <table className="min-w-full border-collapse">
-                  <thead>
-                    <tr className="bg-gray-800 text-white">
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        PERFORMANCE
-                      </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        BTN
-                      </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        WIN/PLACE
-                      </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        IP HI/LOW
-                      </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        DSP/DSLR
-                      </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">OR</th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        SPEED-RATINGS
-                      </th>
-                      <th className="px-4 py-2 text-left cursor-pointer">
-                        RATINGS
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedPerformances(horse.performance_data).map(
-                      (performance_data, index) => (
-                        <React.Fragment key={performance_data.unique_id}>
-                          <tr
-                            className={
-                              index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                            }
-                          >
-                            <td colSpan="11" className="px-4 py-2 text-xl">
-                              <strong>{performance_data.course}</strong> {"  "}
-                              <strong>{performance_data.distance}</strong>
-                              {"  ("}
-                              <strong>
-                                <i>
-                                  {"Class "}
-                                  {performance_data.race_class}
-                                </i>
-                              </strong>
-                              {")"}
-                              {""}
-                              <strong>
-                                <i>{performance_data.conditions}</i>
-                              </strong>
-                              {" ("}
-                              <strong>
-                                <i> {performance_data.going}</i>
-                              </strong>
-                              {")"}
-                              {"  ("}
-                              <strong>
-                                <i>
-                                  {performance_data.total_prize_money}
-                                  {"K"}
-                                </i>
-                              </strong>
-                              {")"}
-                              {" - "}
-                              <span className="text-sm text-gray-500">
-                                {"("}
-                                {performance_data.race_type}
-                                {")  "}
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                {performance_data.race_title}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                            }
-                          >
-                            <td className="px-4 py-2 text-xl">
-                              {"   "}
-                              <span className="text-sm text-gray-500">
-                                {"("}
-                                {performance_data.draw}
-                                {")  "}
-                              </span>{" "}
-                              <strong>
-                                {performance_data.finishing_position}
-                              </strong>{" "}
-                              {"/"}{" "}
-                              <strong>
-                                {performance_data.number_of_runners}
-                              </strong>
-                            </td>
-                            <td className="px-4 py-2">
-                              <strong
-                                className={`
-                                          ${
-                                            performance_data.total_distance_beaten >
+            </div>
+          </h2>
+          {visibleHorses[horse.horse_id] && (
+            <div className="overflow-y-auto" style={{ maxHeight: "640px" }}>
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-800 text-white">
+                    <th className="px-4 py-2 text-left cursor-pointer">
+                      PERFORMANCE
+                    </th>
+                    <th className="px-4 py-2 text-left cursor-pointer">BTN</th>
+                    <th className="px-4 py-2 text-left cursor-pointer">
+                      WIN/PLACE
+                    </th>
+                    <th className="px-4 py-2 text-left cursor-pointer">
+                      IP HI/LOW
+                    </th>
+                    <th className="px-4 py-2 text-left cursor-pointer">
+                      DSP/DSLR
+                    </th>
+                    <th className="px-4 py-2 text-left cursor-pointer">OR</th>
+                    <th className="px-4 py-2 text-left cursor-pointer">
+                      SPEED-RATINGS
+                    </th>
+                    <th className="px-4 py-2 text-left cursor-pointer">
+                      RATINGS
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedPerformances(horse.performance_data).map(
+                    (performance_data, index) => (
+                      <React.Fragment key={performance_data.unique_id}>
+                        <tr
+                          className={
+                            index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                          }
+                        >
+                          <td colSpan="11" className="px-4 py-2 text-xl">
+                            <strong>{performance_data.course}</strong> {"  "}
+                            <strong>{performance_data.distance}</strong>
+                            {"  ("}
+                            <strong>
+                              <i>
+                                {"Class "}
+                                {performance_data.race_class}
+                              </i>
+                            </strong>
+                            {")"}
+                            {""}
+                            <strong>
+                              <i>{performance_data.conditions}</i>
+                            </strong>
+                            {" ("}
+                            <strong>
+                              <i> {performance_data.going}</i>
+                            </strong>
+                            {")"}
+                            {"  ("}
+                            <strong>
+                              <i>
+                                {performance_data.total_prize_money}
+                                {"K"}
+                              </i>
+                            </strong>
+                            {")"}
+                            {" - "}
+                            <span className="text-sm text-gray-500">
+                              {"("}
+                              {performance_data.race_type}
+                              {")  "}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {performance_data.race_title}
+                            </span>
+                          </td>
+                        </tr>
+                        <tr
+                          className={
+                            index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                          }
+                        >
+                          <td className="px-4 py-2 text-xl">
+                            {"   "}
+                            <span className="text-sm text-gray-500">
+                              {"("}
+                              {performance_data.draw}
+                              {")  "}
+                            </span>{" "}
+                            <strong>
+                              {performance_data.finishing_position}
+                            </strong>{" "}
+                            {"/"}{" "}
+                            <strong>
+                              {performance_data.number_of_runners}
+                            </strong>
+                          </td>
+                          <td className="px-4 py-2">
+                            <strong
+                              className={`
+                                        ${
+                                          performance_data.total_distance_beaten >
+                                          4
+                                            ? "text-red-400"
+                                            : ""
+                                        } 
+                                        ${
+                                          performance_data.total_distance_beaten >
+                                            0 &&
+                                          performance_data.total_distance_beaten <
                                             4
-                                              ? "text-red-400"
-                                              : ""
-                                          } 
-                                          ${
-                                            performance_data.total_distance_beaten >
-                                              0 &&
-                                            performance_data.total_distance_beaten <
-                                              4
-                                              ? "text-blue-400"
-                                              : ""
-                                          }
-                                          ${
-                                            performance_data.total_distance_beaten <=
-                                            0
-                                              ? "text-green-400"
-                                              : ""
-                                          }
-                                      `}
-                              >
-                                {"  ("}
-                                <i>{performance_data.total_distance_beaten}</i>
-                                {")"}
-                              </strong>
-                            </td>
+                                            ? "text-blue-400"
+                                            : ""
+                                        }
+                                        ${
+                                          performance_data.total_distance_beaten <=
+                                          0
+                                            ? "text-green-400"
+                                            : ""
+                                        }
+                                    `}
+                            >
+                              {"  ("}
+                              <i>{performance_data.total_distance_beaten}</i>
+                              {")"}
+                            </strong>
+                          </td>
 
-                            <td>
-                              <span className="bg-blue-200 px-2 py-2 rounded ml-2">
-                                {performance_data.betfair_win_sp}
-                              </span>
-                              <span className="bg-blue-200 px-2 py-2 rounded ml-2">
-                                {performance_data.betfair_place_sp}
-                              </span>
-                            </td>
-                            <td className="px-4 py-2">
+                          <td>
+                            <span className="bg-blue-200 px-2 py-2 rounded ml-2">
+                              {performance_data.betfair_win_sp}
+                            </span>
+                            <span className="bg-blue-200 px-2 py-2 rounded ml-2">
+                              {performance_data.betfair_place_sp}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2">
+                            <span
+                              className={`
+                                px-2 py-2 rounded ml-2 
+                                ${
+                                  performance_data.in_play_high === null
+                                    ? "bg-red-200"
+                                    : "bg-green-200"
+                                }
+                              `}
+                            >
+                              {performance_data.in_play_high ??
+                                performance_data.in_play_low}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2">
+                            {performance_data.days_since_performance} {"/ "}
+                            {performance_data.days_since_last_ran}
+                          </td>
+                          <td className="px-4 py-2">
+                            {performance_data.official_rating}
+                          </td>
+                          <td className="px-4 py-2">
+                            {performance_data.speed_figure}
+                            {performance_data.speed_rating_diff !== 0 && (
                               <span
-                                className={`
-                                  px-2 py-2 rounded ml-2 
-                                  ${
-                                    performance_data.in_play_high === null
-                                      ? "bg-red-200"
-                                      : "bg-green-200"
-                                  }
-                                `}
+                                className={
+                                  performance_data.speed_rating_diff > 0
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }
                               >
-                                {performance_data.in_play_high ??
-                                  performance_data.in_play_low}
+                                {" ("}
+                                <i>{performance_data.speed_rating_diff}</i>
+                                {")"}
                               </span>
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.days_since_performance} {"/ "}
-                              {performance_data.days_since_last_ran}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.official_rating}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.speed_figure}
-                              {performance_data.speed_rating_diff !== 0 && (
-                                <span
-                                  className={
-                                    performance_data.speed_rating_diff > 0
-                                      ? "text-green-500"
-                                      : "text-red-500"
-                                  }
-                                >
-                                  {" ("}
-                                  <i>{performance_data.speed_rating_diff}</i>
-                                  {")"}
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-2">
-                              {performance_data.rating}
-                              {performance_data.rating_diff !== 0 && (
-                                <span
-                                  className={
-                                    performance_data.rating_diff > 0
-                                      ? "text-green-500"
-                                      : "text-red-500"
-                                  }
-                                >
-                                  {" ("}
-                                  <i>{performance_data.rating_diff}</i>
-                                  {")"}
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                            }
-                          >
-                            <td className="px-4 py-2" colSpan={8}>
-                              {performance_data.main_race_comment}
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                            }
-                          >
-                            <td className="px-4 py-2" colSpan={8}>
-                              {performance_data.tf_comment}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        ))}
+                            )}
+                          </td>
+                          <td className="px-4 py-2">
+                            {performance_data.rating}
+                            {performance_data.rating_diff !== 0 && (
+                              <span
+                                className={
+                                  performance_data.rating_diff > 0
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }
+                              >
+                                {" ("}
+                                <i>{performance_data.rating_diff}</i>
+                                {")"}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                        <tr
+                          className={
+                            index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                          }
+                        >
+                          <td className="px-4 py-2" colSpan={8}>
+                            {performance_data.main_race_comment}
+                          </td>
+                        </tr>
+                        <tr
+                          className={
+                            index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                          }
+                        >
+                          <td className="px-4 py-2" colSpan={8}>
+                            {performance_data.tf_comment}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
