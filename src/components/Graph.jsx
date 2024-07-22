@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -47,31 +47,79 @@ const Utils = {
   },
 };
 
-const generateChartData = (sampleData, filter) => {
+const generateChartData = (raceData, filter, visibleHorses) => {
+  if (!raceData || !raceData.horse_data) return { labels: [], datasets: [] };
+
   // Get all unique race dates and sort them
   const labels = Array.from(
     new Set(
-      sampleData.flatMap((item) =>
-        item.performance_data.map((data) => data.race_date)
+      raceData.horse_data.flatMap(
+        (horse) => horse.performance_data?.map((data) => data.race_date) || []
       )
     )
   ).sort((a, b) => new Date(a) - new Date(b));
 
-  const datasets = sampleData.map((horse, index) => {
-    const color = colorPalette[index % colorPalette.length];
-    return {
-      label: horse.horse_name,
-      data: labels.map((label) => {
-        const dataPoint = horse.performance_data.find(
-          (data) => data.race_date === label
-        );
-        return dataPoint ? dataPoint[filter] : null;
-      }),
-      borderColor: color,
-      backgroundColor: Utils.transparentize(color, 0.5),
+  const datasets = raceData.horse_data
+    .filter((horse) => visibleHorses[horse.horse_id])
+    .map((horse, index) => {
+      const color = colorPalette[index % colorPalette.length];
+      return {
+        label: horse.horse_name,
+        data: labels.map((label) => {
+          const dataPoint = horse.performance_data?.find(
+            (data) => data.race_date === label
+          );
+          return dataPoint ? dataPoint[filter] : null;
+        }),
+        borderColor: color,
+        backgroundColor: Utils.transparentize(color, 0.5),
+        spanGaps: true,
+      };
+    });
+
+  return {
+    labels,
+    datasets,
+  };
+};
+
+const generateSingleHorseChartData = (horseData) => {
+  if (!horseData || !horseData.performance_data)
+    return { labels: [], datasets: [] };
+
+  const labels = horseData.performance_data
+    .map((data) => data.race_date)
+    .sort((a, b) => new Date(b) - new Date(a)); // Sort in descending order
+
+  const datasets = [
+    {
+      label: "Official Rating",
+      data: horseData.performance_data
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
+        .map((data) => data.official_rating),
+      borderColor: "rgb(255, 99, 132)", // Red
+      backgroundColor: Utils.transparentize("rgb(255, 99, 132)", 0.5),
       spanGaps: true,
-    };
-  });
+    },
+    {
+      label: "Rolling Speed",
+      data: horseData.performance_data
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
+        .map((data) => data.rolling_speed_rating),
+      borderColor: "rgb(75, 192, 192)", // Green
+      backgroundColor: Utils.transparentize("rgb(75, 192, 192)", 0.5),
+      spanGaps: true,
+    },
+    {
+      label: "Rolling Rating",
+      data: horseData.performance_data
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
+        .map((data) => data.rolling_rating),
+      borderColor: "rgb(54, 162, 235)", // Blue
+      backgroundColor: Utils.transparentize("rgb(54, 162, 235)", 0.5),
+      spanGaps: true,
+    },
+  ];
 
   return {
     labels,
@@ -96,15 +144,14 @@ const config = {
       },
       zoom: {
         pan: {
-          enabled: true,
-          mode: "xy",
+          enabled: false, // Disable panning
         },
         zoom: {
           wheel: {
-            enabled: true,
+            enabled: false, // Disable zooming with the mouse wheel
           },
           pinch: {
-            enabled: true,
+            enabled: false, // Disable zooming with pinch gestures
           },
           mode: "xy",
         },
@@ -136,7 +183,18 @@ const config = {
   },
 };
 
-export function RaceGraph({ data, filter }) {
-  const chartData = generateChartData(data, filter);
-  return <Line data={chartData} options={config.options} />;
+export function Graph({ data, filter, visibleHorses, selectedHorse }) {
+  const chartData = generateChartData(data, filter, visibleHorses);
+  const singleHorseChartData = selectedHorse
+    ? generateSingleHorseChartData(selectedHorse)
+    : { labels: [], datasets: [] };
+
+  return (
+    <div>
+      <Line data={chartData} options={config.options} />
+      {selectedHorse && (
+        <Line data={singleHorseChartData} options={config.options} />
+      )}
+    </div>
+  );
 }

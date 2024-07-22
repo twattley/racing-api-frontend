@@ -11,9 +11,6 @@ export function Home() {
       <Link to="/today" className={`${button} ${activeButton}`}>
         Today
       </Link>
-      <Link to="/tomorrow" className={`${button} ${activeButton}`}>
-        Tomorrow
-      </Link>
       <Link to="/feedback" className={`${button} ${activeButton}`}>
         Feedback
       </Link>
