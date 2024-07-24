@@ -102,19 +102,19 @@ const generateSingleHorseChartData = (horseData) => {
       spanGaps: true,
     },
     {
-      label: "Rolling Speed",
+      label: "Speed",
       data: horseData.performance_data
         .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
-        .map((data) => data.rolling_speed_rating),
+        .map((data) => data.speed_figure),
       borderColor: "rgb(75, 192, 192)", // Green
       backgroundColor: Utils.transparentize("rgb(75, 192, 192)", 0.5),
       spanGaps: true,
     },
     {
-      label: "Rolling Rating",
+      label: "Rating",
       data: horseData.performance_data
         .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
-        .map((data) => data.rolling_rating),
+        .map((data) => data.rating),
       borderColor: "rgb(54, 162, 235)", // Blue
       backgroundColor: Utils.transparentize("rgb(54, 162, 235)", 0.5),
       spanGaps: true,

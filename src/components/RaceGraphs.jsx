@@ -25,10 +25,9 @@ export function RaceGraphs({ data, visibleHorses }) {
           onChange={(e) => setFilter(e.target.value)}
           className="p-2 border rounded-md"
         >
+          <option value="official_rating">OFFICIAL RATING</option>
           <option value="rating">RATING</option>
           <option value="speed_figure">SPEED</option>
-          <option value="rolling_speed_rating">ROLLING SPEED</option>
-          <option value="rolling_rating">ROLLING RATING</option>
         </select>
       </div>
       <div className="mb-4 pt-4">
