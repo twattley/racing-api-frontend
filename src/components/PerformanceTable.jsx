@@ -1,5 +1,25 @@
 import React from "react";
 
+const getSurfaceColorClass = (surface) => {
+  const normalizedSurface = surface.trim().toLowerCase();
+  console.log(`Normalized surface: ${normalizedSurface}`); // Debugging line
+  switch (normalizedSurface) {
+    case "turf":
+      return "bg-green-500";
+    case "polytrack":
+      return "bg-brown-700";
+    case "tapeta":
+      return "bg-brown-300";
+    case "fibresand":
+      return "bg-yellow-700";
+    case "artificial":
+      return "bg-yellow-300";
+    default:
+      console.log(`Unknown surface: ${surface}`);
+      return "";
+  }
+};
+
 export function PerformanceTable({ horse, visibleHorses, data }) {
   return (
     visibleHorses[horse.horse_id] && (
@@ -8,7 +28,7 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
           <thead className="sticky top-0 z-10 bg-gray-800">
             <tr className="bg-gray-800 text-white">
               <td colSpan="7" className="px-4 py-2">
-                <div className="grid grid-cols-[200px,150px,180px,80px,140px,80px,80px] gap-2">
+                <div className="grid grid-cols-[200px,80px,180px,50px,140px,50px,80px,130px] gap-2">
                   <span className="border border-gray-300 px-2 py-1 rounded text-xl">
                     {data.course}
                   </span>
@@ -30,6 +50,13 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                   <span className="border border-gray-300 px-2 py-1 rounded text-xl">
                     {data.race_type}
                   </span>
+                  <span
+                    className={`border border-gray-300 px-2 py-1 rounded text-xl text-white ${getSurfaceColorClass(
+                      data.surface
+                    )}`}
+                  >
+                    {data.surface}
+                  </span>
                 </div>
               </td>
             </tr>
@@ -43,7 +70,7 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                 <React.Fragment key={performance_data.unique_id}>
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     <td colSpan="11" className="px-4 py-2 text-xl">
-                      <div className="grid grid-cols-[200px,150px,180px,80px,140px,80px,80px] gap-2">
+                      <div className="grid grid-cols-[200px,80px,180px,50px,140px,50px,80px,130px] gap-2">
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.course}
                         </span>
@@ -65,12 +92,19 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.race_type}
                         </span>
+                        <span
+                          className={`border border-gray-300 px-2 py-1 rounded text-xl text-white ${getSurfaceColorClass(
+                            performance_data.surface
+                          )}`}
+                        >
+                          {performance_data.surface}
+                        </span>
                       </div>
                     </td>
                   </tr>
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     <td colSpan="11" className="px-4 py-2 text-xl">
-                      <div className="grid grid-cols-[60px,80px,80px,80px,80px,100px,100px,1fr,100px,100px] gap-2">
+                      <div className="grid grid-cols-[60px,80px,80px,80px,70px,70px,1fr,100px,100px] gap-2">
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           ({performance_data.draw})
                         </span>
@@ -105,16 +139,11 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                         <span className="bg-blue-200 px-2 py-1 rounded">
                           {performance_data.betfair_win_sp}
                         </span>
-                        <span className="bg-blue-200 px-2 py-1 rounded">
-                          {performance_data.betfair_place_sp}
+                        <span className="border border-gray-300 px-2 py-1 rounded">
+                          {performance_data.weeks_since_performance}{" "}
                         </span>
                         <span className="border border-gray-300 px-2 py-1 rounded">
-                          {performance_data.days_since_performance}{" "}
-                          <span className="text-gray-400 text-sm">(dsp)</span>
-                        </span>
-                        <span className="border border-gray-300 px-2 py-1 rounded">
-                          {performance_data.days_since_last_ran}{" "}
-                          <span className="text-gray-400 text-sm">(dslr)</span>
+                          {performance_data.weeks_since_last_ran}{" "}
                         </span>
                         <div></div> {/* This creates the gap */}
                         <span className="border border-gray-300 px-2 py-1 rounded">

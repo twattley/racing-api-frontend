@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 
 export function FeedbackTabs({ race_id }) {
   return (
-    <div className="container mx-auto p-4">
+    <div className="w-full p-4">
       <div className="tabs flex justify-start bg-white border-b border-gray-300 pb-4">
         <NavLink
           to={`/feedback_race/${race_id}/`}

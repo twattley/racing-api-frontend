@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Graph } from "./Graph";
 
 export function RaceGraphs({ data, visibleHorses }) {
-  const [filter, setFilter] = useState("official_rating");
+  const [filter, setFilter] = useState("rating");
   const [selectedHorseId, setSelectedHorseId] = useState(null);
 
   if (!data) {
