@@ -14,6 +14,7 @@ export function FeedbackRaceWrapper() {
     visibleHorses,
     setVisibleHorses,
     sortedHorses,
+    resetVisibility,
   } = useRaceData(`/feedback/todays-races/by-race-id?race_id=${race_id}`);
 
   if (raceDataLoading) {
@@ -26,7 +27,7 @@ export function FeedbackRaceWrapper() {
 
   return (
     <div>
-      <FeedbackTabs race_id={race_id} />{" "}
+      <FeedbackTabs race_id={race_id} />
       <div className="flex h-screen">
         <div className="w-1/2 overflow-y-auto px-4 py-2 bg-white rounded-lg shadow">
           <RaceDetails
@@ -35,6 +36,7 @@ export function FeedbackRaceWrapper() {
             visibleHorses={visibleHorses}
             setVisibleHorses={setVisibleHorses}
             sortedHorses={sortedHorses}
+            resetVisibility={resetVisibility}
           />
         </div>
         <div className="w-1/2 px-4 py-2 bg-white rounded-lg shadow sticky top-0 h-screen">
