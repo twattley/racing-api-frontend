@@ -16,6 +16,24 @@ import {
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom";
 
+const getSurfaceColorClass = (surface) => {
+  const normalizedSurface = surface.trim().toLowerCase();
+  switch (normalizedSurface) {
+    case "turf":
+      return "rgb(34, 197, 94)"; // Green
+    case "polytrack":
+      return "rgb(121, 85, 72)"; // Brown
+    case "tapeta":
+      return "rgb(188, 143, 143)"; // Light Brown
+    case "fibresand":
+      return "rgb(255, 193, 7)"; // Yellow
+    case "artificial":
+      return "rgb(255, 235, 59)"; // Light Yellow
+    default:
+      return "rgb(0, 0, 0)"; // Black for unknown surfaces
+  }
+};
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -50,7 +68,6 @@ const Utils = {
 const generateChartData = (raceData, filter, visibleHorses) => {
   if (!raceData || !raceData.horse_data) return { labels: [], datasets: [] };
 
-  // Get all unique race dates and sort them
   const labels = Array.from(
     new Set(
       raceData.horse_data.flatMap(
@@ -71,9 +88,19 @@ const generateChartData = (raceData, filter, visibleHorses) => {
           );
           return dataPoint ? dataPoint[filter] : null;
         }),
+        pointBackgroundColor: labels.map((label) => {
+          const dataPoint = horse.performance_data?.find(
+            (data) => data.race_date === label
+          );
+          return dataPoint
+            ? getSurfaceColorClass(dataPoint.surface)
+            : "rgba(0,0,0,0)";
+        }),
         borderColor: color,
         backgroundColor: Utils.transparentize(color, 0.5),
         spanGaps: true,
+        pointRadius: 7, // Increase point size
+        pointHoverRadius: 9, // Increase point hover size
       };
     });
 
@@ -89,35 +116,50 @@ const generateSingleHorseChartData = (horseData) => {
 
   const labels = horseData.performance_data
     .map((data) => data.race_date)
-    .sort((a, b) => new Date(b) - new Date(a)); // Sort in descending order
+    .sort((a, b) => new Date(b) - new Date(a));
 
   const datasets = [
     {
       label: "Official Rating",
       data: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
         .map((data) => data.official_rating),
-      borderColor: "rgb(255, 99, 132)", // Red
+      pointBackgroundColor: horseData.performance_data
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
+        .map((data) => getSurfaceColorClass(data.surface)),
+      borderColor: "rgb(255, 99, 132)",
       backgroundColor: Utils.transparentize("rgb(255, 99, 132)", 0.5),
       spanGaps: true,
+      pointRadius: 7, // Increase point size
+      pointHoverRadius: 9, // Increase point hover size
     },
     {
       label: "Speed",
       data: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
         .map((data) => data.speed_figure),
-      borderColor: "rgb(75, 192, 192)", // Green
+      pointBackgroundColor: horseData.performance_data
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
+        .map((data) => getSurfaceColorClass(data.surface)),
+      borderColor: "rgb(75, 192, 192)",
       backgroundColor: Utils.transparentize("rgb(75, 192, 192)", 0.5),
       spanGaps: true,
+      pointRadius: 7, // Increase point size
+      pointHoverRadius: 9, // Increase point hover size
     },
     {
       label: "Rating",
       data: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date)) // Sort in descending order
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
         .map((data) => data.rating),
-      borderColor: "rgb(54, 162, 235)", // Blue
+      pointBackgroundColor: horseData.performance_data
+        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
+        .map((data) => getSurfaceColorClass(data.surface)),
+      borderColor: "rgb(54, 162, 235)",
       backgroundColor: Utils.transparentize("rgb(54, 162, 235)", 0.5),
       spanGaps: true,
+      pointRadius: 7, // Increase point size
+      pointHoverRadius: 9, // Increase point hover size
     },
   ];
 
