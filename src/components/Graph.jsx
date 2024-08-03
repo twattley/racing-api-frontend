@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,6 +15,22 @@ import {
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom";
+import annotationPlugin from "chartjs-plugin-annotation";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+  TimeScale,
+  TimeSeriesScale,
+  zoomPlugin,
+  annotationPlugin
+);
 
 const getSurfaceColorClass = (surface) => {
   const normalizedSurface = surface.trim().toLowerCase();
@@ -34,21 +50,6 @@ const getSurfaceColorClass = (surface) => {
   }
 };
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-  TimeScale,
-  TimeSeriesScale,
-  zoomPlugin
-);
-
-// Predefined Color Palette (Add more if needed)
 const colorPalette = [
   "rgb(75, 192, 192)", // Green
   "rgb(54, 162, 235)", // Blue
@@ -110,53 +111,77 @@ const generateChartData = (raceData, filter, visibleHorses) => {
   };
 };
 
-const generateSingleHorseChartData = (horseData) => {
-  if (!horseData || !horseData.performance_data)
+const generateSingleHorseChartData = (selectedHorse) => {
+  if (!selectedHorse || !selectedHorse.performance_data)
     return { labels: [], datasets: [] };
 
-  const labels = horseData.performance_data
+  const labels = selectedHorse.performance_data
     .map((data) => data.race_date)
-    .sort((a, b) => new Date(b) - new Date(a));
+    .sort((a, b) => new Date(a) - new Date(b));
 
   const datasets = [
     {
-      label: "Official Rating",
-      data: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
-        .map((data) => data.official_rating),
-      pointBackgroundColor: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
-        .map((data) => getSurfaceColorClass(data.surface)),
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: Utils.transparentize("rgb(255, 99, 132)", 0.5),
-      spanGaps: true,
-      pointRadius: 7, // Increase point size
-      pointHoverRadius: 9, // Increase point hover size
-    },
-    {
-      label: "Speed",
-      data: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
-        .map((data) => data.speed_figure),
-      pointBackgroundColor: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
-        .map((data) => getSurfaceColorClass(data.surface)),
-      borderColor: "rgb(75, 192, 192)",
+      label: `Official Rating`,
+      data: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint ? dataPoint.official_rating : null;
+      }),
+      pointBackgroundColor: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint
+          ? getSurfaceColorClass(dataPoint.surface)
+          : "rgba(0,0,0,0)";
+      }),
+      borderColor: "rgb(75, 192, 192)", // Green
       backgroundColor: Utils.transparentize("rgb(75, 192, 192)", 0.5),
       spanGaps: true,
       pointRadius: 7, // Increase point size
       pointHoverRadius: 9, // Increase point hover size
     },
     {
-      label: "Rating",
-      data: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
-        .map((data) => data.rating),
-      pointBackgroundColor: horseData.performance_data
-        .sort((a, b) => new Date(b.race_date) - new Date(a.race_date))
-        .map((data) => getSurfaceColorClass(data.surface)),
-      borderColor: "rgb(54, 162, 235)",
+      label: `Rating`,
+      data: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint ? dataPoint.rating : null;
+      }),
+      pointBackgroundColor: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint
+          ? getSurfaceColorClass(dataPoint.surface)
+          : "rgba(0,0,0,0)";
+      }),
+      borderColor: "rgb(54, 162, 235)", // Blue
       backgroundColor: Utils.transparentize("rgb(54, 162, 235)", 0.5),
+      spanGaps: true,
+      pointRadius: 7, // Increase point size
+      pointHoverRadius: 9, // Increase point hover size
+    },
+    {
+      label: `Speed Figure`,
+      data: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint ? dataPoint.speed_figure : null;
+      }),
+      pointBackgroundColor: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint
+          ? getSurfaceColorClass(dataPoint.surface)
+          : "rgba(0,0,0,0)";
+      }),
+      borderColor: "rgb(255, 206, 86)", // Yellow
+      backgroundColor: Utils.transparentize("rgb(255, 206, 86)", 0.5),
       spanGaps: true,
       pointRadius: 7, // Increase point size
       pointHoverRadius: 9, // Increase point hover size
@@ -198,6 +223,9 @@ const config = {
           mode: "xy",
         },
       },
+      annotation: {
+        annotations: {},
+      },
     },
     scales: {
       x: {
@@ -226,14 +254,106 @@ const config = {
 };
 
 export function Graph({ data, filter, visibleHorses, selectedHorse }) {
+  const chartRef = useRef(null);
+  const [annotations, setAnnotations] = useState({});
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [startPoint, setStartPoint] = useState(null);
+
   const chartData = generateChartData(data, filter, visibleHorses);
   const singleHorseChartData = selectedHorse
     ? generateSingleHorseChartData(selectedHorse)
     : { labels: [], datasets: [] };
 
+  const handleMouseDown = (event) => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    const x = event.nativeEvent.offsetX;
+    const y = event.nativeEvent.offsetY;
+    const xValue = chart.scales.x.getValueForPixel(x);
+    const yValue = chart.scales.y.getValueForPixel(y);
+
+    setStartPoint({ x: xValue, y: yValue });
+    setIsDrawing(true);
+  };
+
+  const handleMouseMove = (event) => {
+    if (!isDrawing) return;
+
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    const x = event.nativeEvent.offsetX;
+    const y = event.nativeEvent.offsetY;
+    const xValue = chart.scales.x.getValueForPixel(x);
+    const yValue = chart.scales.y.getValueForPixel(y);
+
+    const newAnnotations = {
+      ...annotations,
+      tempLine: {
+        type: "line",
+        xMin: startPoint.x,
+        xMax: xValue,
+        yMin: startPoint.y,
+        yMax: yValue,
+        borderColor: "black", // Change line color to black
+        borderWidth: 3, // Increase line thickness
+      },
+    };
+
+    setAnnotations(newAnnotations);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDrawing) return;
+
+    const newAnnotations = { ...annotations };
+    delete newAnnotations.tempLine;
+
+    const lineId = `line${Object.keys(annotations).length + 1}`;
+    newAnnotations[lineId] = {
+      type: "line",
+      xMin: startPoint.x,
+      xMax: annotations.tempLine.xMax,
+      yMin: startPoint.y,
+      yMax: annotations.tempLine.yMax,
+      borderColor: "black", // Change line color to black
+      borderWidth: 3, // Increase line thickness
+    };
+
+    setAnnotations(newAnnotations);
+    setIsDrawing(false);
+    setStartPoint(null);
+  };
+
+  const handleClearAnnotations = () => {
+    setAnnotations({});
+  };
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (chart) {
+      chart.options.plugins.annotation.annotations = annotations;
+      chart.update();
+    }
+  }, [annotations]);
+
   return (
     <div>
-      <Line data={chartData} options={config.options} />
+      <button
+        onClick={handleClearAnnotations}
+        className="mb-4 px-6 py-2 bg-red-500 text-white rounded"
+      >
+        Clear Annotations
+      </button>
+      <Line
+        ref={chartRef}
+        data={chartData}
+        options={config.options}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      />
       {selectedHorse && (
         <Line data={singleHorseChartData} options={config.options} />
       )}
