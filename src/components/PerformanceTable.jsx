@@ -2,7 +2,6 @@ import React from "react";
 
 const getSurfaceColorClass = (surface) => {
   const normalizedSurface = surface.trim().toLowerCase();
-  console.log(`Normalized surface: ${normalizedSurface}`); // Debugging line
   switch (normalizedSurface) {
     case "turf":
       return "bg-green-500";
