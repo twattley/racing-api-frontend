@@ -102,6 +102,7 @@ const generateChartData = (raceData, filter, visibleHorses) => {
         spanGaps: true,
         pointRadius: 7, // Increase point size
         pointHoverRadius: 9, // Increase point hover size
+        originalBorderColor: color, // Store original color
       };
     });
 
@@ -141,6 +142,7 @@ const generateSingleHorseChartData = (selectedHorse) => {
       spanGaps: true,
       pointRadius: 7, // Increase point size
       pointHoverRadius: 9, // Increase point hover size
+      originalBorderColor: "rgb(75, 192, 192)", // Store original color
     },
     {
       label: `Rating`,
@@ -163,6 +165,7 @@ const generateSingleHorseChartData = (selectedHorse) => {
       spanGaps: true,
       pointRadius: 7, // Increase point size
       pointHoverRadius: 9, // Increase point hover size
+      originalBorderColor: "rgb(54, 162, 235)", // Store original color
     },
     {
       label: `Speed Figure`,
@@ -185,6 +188,7 @@ const generateSingleHorseChartData = (selectedHorse) => {
       spanGaps: true,
       pointRadius: 7, // Increase point size
       pointHoverRadius: 9, // Increase point hover size
+      originalBorderColor: "rgb(255, 206, 86)", // Store original color
     },
   ];
 
@@ -250,85 +254,103 @@ const config = {
         },
       },
     },
+    hover: {
+      mode: "nearest",
+      intersect: true,
+    },
+    onHover: (event, chartElement) => {
+      const chart = chartRef.current;
+      if (chart) {
+        const datasets = chart.data.datasets;
+        if (chartElement.length) {
+          const datasetIndex = chartElement[0].datasetIndex;
+          datasets.forEach((dataset, index) => {
+            dataset.borderWidth = index === datasetIndex ? 3 : 1;
+            dataset.borderColor =
+              index === datasetIndex
+                ? dataset.originalBorderColor
+                : Utils.transparentize(dataset.originalBorderColor, 0.5);
+          });
+        } else {
+          datasets.forEach((dataset) => {
+            dataset.borderWidth = 1;
+            dataset.borderColor = dataset.originalBorderColor;
+          });
+        }
+        chart.update();
+      }
+    },
   },
 };
 
 export function Graph({ data, filter, visibleHorses, selectedHorse }) {
   const chartRef = useRef(null);
   const [annotations, setAnnotations] = useState({});
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [startPoint, setStartPoint] = useState(null);
 
   const chartData = generateChartData(data, filter, visibleHorses);
   const singleHorseChartData = selectedHorse
     ? generateSingleHorseChartData(selectedHorse)
     : { labels: [], datasets: [] };
 
-  const handleMouseDown = (event) => {
-    const chart = chartRef.current;
-    if (!chart) return;
+  // Calculate median and quartiles
+  const allRatings = data.horse_data
+    .flatMap((horse) => horse.performance_data.map((d) => d[filter]))
+    .filter((rating) => rating !== null && rating !== undefined);
 
-    const x = event.nativeEvent.offsetX;
-    const y = event.nativeEvent.offsetY;
-    const xValue = chart.scales.x.getValueForPixel(x);
-    const yValue = chart.scales.y.getValueForPixel(y);
+  const sortedRatings = allRatings.sort((a, b) => a - b);
+  const medianRating = sortedRatings[Math.floor(sortedRatings.length / 2)];
+  const q1Rating = sortedRatings[Math.floor(sortedRatings.length / 4)];
+  const q3Rating = sortedRatings[Math.floor((sortedRatings.length * 3) / 4)];
 
-    setStartPoint({ x: xValue, y: yValue });
-    setIsDrawing(true);
-  };
-
-  const handleMouseMove = (event) => {
-    if (!isDrawing) return;
-
-    const chart = chartRef.current;
-    if (!chart) return;
-
-    const x = event.nativeEvent.offsetX;
-    const y = event.nativeEvent.offsetY;
-    const xValue = chart.scales.x.getValueForPixel(x);
-    const yValue = chart.scales.y.getValueForPixel(y);
-
-    const newAnnotations = {
-      ...annotations,
-      tempLine: {
-        type: "line",
-        xMin: startPoint.x,
-        xMax: xValue,
-        yMin: startPoint.y,
-        yMax: yValue,
-        borderColor: "black", // Change line color to black
-        borderWidth: 3, // Increase line thickness
-      },
-    };
-
-    setAnnotations(newAnnotations);
-  };
-
-  const handleMouseUp = () => {
-    if (!isDrawing) return;
-
-    const newAnnotations = { ...annotations };
-    delete newAnnotations.tempLine;
-
-    const lineId = `line${Object.keys(annotations).length + 1}`;
-    newAnnotations[lineId] = {
+  // Add annotations for median and quartiles
+  const ratingAnnotations = {
+    q3Rating: {
       type: "line",
-      xMin: startPoint.x,
-      xMax: annotations.tempLine.xMax,
-      yMin: startPoint.y,
-      yMax: annotations.tempLine.yMax,
-      borderColor: "black", // Change line color to black
-      borderWidth: 3, // Increase line thickness
-    };
-
-    setAnnotations(newAnnotations);
-    setIsDrawing(false);
-    setStartPoint(null);
+      yMin: q3Rating,
+      yMax: q3Rating,
+      borderColor: "orange",
+      borderWidth: 2,
+      borderDash: [10, 5],
+      label: {
+        content: "Q3 Rating",
+        enabled: true,
+        position: "end",
+      },
+    },
+    medianRating: {
+      type: "line",
+      yMin: medianRating,
+      yMax: medianRating,
+      borderColor: "blue",
+      borderWidth: 2,
+      borderDash: [10, 5],
+      label: {
+        content: "Median Rating",
+        enabled: true,
+        position: "end",
+      },
+    },
+    q1Rating: {
+      type: "line",
+      yMin: q1Rating,
+      yMax: q1Rating,
+      borderColor: "purple",
+      borderWidth: 2,
+      borderDash: [10, 5],
+      label: {
+        content: "Q1 Rating",
+        enabled: true,
+        position: "end",
+      },
+    },
   };
 
-  const handleClearAnnotations = () => {
-    setAnnotations({});
-  };
+  useEffect(() => {
+    setAnnotations((prevAnnotations) => ({
+      ...prevAnnotations,
+      ...ratingAnnotations,
+    }));
+  }, [medianRating, q1Rating, q3Rating]);
 
   useEffect(() => {
     const chart = chartRef.current;
@@ -340,20 +362,7 @@ export function Graph({ data, filter, visibleHorses, selectedHorse }) {
 
   return (
     <div>
-      <button
-        onClick={handleClearAnnotations}
-        className="mb-4 px-6 py-2 bg-red-500 text-white rounded"
-      >
-        Clear Annotations
-      </button>
-      <Line
-        ref={chartRef}
-        data={chartData}
-        options={config.options}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-      />
+      <Line ref={chartRef} data={chartData} options={config.options} />
       {selectedHorse && (
         <Line data={singleHorseChartData} options={config.options} />
       )}
