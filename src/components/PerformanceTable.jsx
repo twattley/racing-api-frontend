@@ -141,7 +141,13 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.weeks_since_performance}{" "}
                         </span>
-                        <span className="border border-gray-300 px-2 py-1 rounded">
+                        <span
+                          className={`border border-gray-300 px-2 py-1 rounded ${
+                            performance_data.weeks_since_last_ran > 16
+                              ? "bg-red-500"
+                              : ""
+                          }`}
+                        >
                           {performance_data.weeks_since_last_ran}{" "}
                         </span>
                         <div></div> {/* This creates the gap */}

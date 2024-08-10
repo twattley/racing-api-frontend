@@ -13,6 +13,7 @@ export function TodaysRaceWrapper() {
     visibleHorses,
     setVisibleHorses,
     sortedHorses,
+    resetVisibility,
   } = useRaceData(`/today/todays-races/by-race-id?race_id=${race_id}`);
 
   if (raceDataLoading) {
@@ -33,6 +34,7 @@ export function TodaysRaceWrapper() {
             visibleHorses={visibleHorses}
             setVisibleHorses={setVisibleHorses}
             sortedHorses={sortedHorses}
+            resetVisibility={resetVisibility}
           />
         </div>
         <div className="w-1/2 px-4 py-2 bg-white rounded-lg shadow sticky top-0 h-screen">
