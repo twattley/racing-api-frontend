@@ -27,7 +27,7 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
           <thead className="sticky top-0 z-10 bg-gray-800">
             <tr className="bg-gray-800 text-white">
               <td colSpan="7" className="px-4 py-2">
-                <div className="grid grid-cols-[200px,80px,180px,50px,140px,50px,80px,130px] gap-2">
+                <div className="grid grid-cols-[200px,80px,180px,50px,80px,80px,50px,80px,130px] gap-2">
                   <span className="border border-gray-300 px-2 py-1 rounded text-xl">
                     {data.course}
                   </span>
@@ -41,7 +41,10 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                     {data.race_class}
                   </span>
                   <span className="border border-gray-300 px-2 py-1 rounded text-xl">
-                    {data.conditions}
+                    {data.hcap_range}
+                  </span>
+                  <span className="border border-gray-300 px-2 py-1 rounded text-xl">
+                    {data.age_range}
                   </span>
                   <span className="border border-gray-300 px-2 py-1 rounded text-xl">
                     {data.first_place_prize_money}
@@ -69,7 +72,7 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                 <React.Fragment key={performance_data.unique_id}>
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     <td colSpan="11" className="px-4 py-2 text-xl">
-                      <div className="grid grid-cols-[200px,80px,180px,50px,140px,50px,80px,130px] gap-2">
+                      <div className="grid grid-cols-[200px,80px,180px,50px,80px,80px,50px,80px,130px] gap-2">
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.course}
                         </span>
@@ -79,11 +82,32 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.going}
                         </span>
-                        <span className="border border-gray-300 px-2 py-1 rounded">
-                          {performance_data.race_class}
+                        <span className="border border-gray-300 px-2 py-1 rounded flex items-center justify-between">
+                          <span>{performance_data.race_class}</span>
+                          {performance_data.class_diff === "higher" && (
+                            <span className="text-green-500 text-xl">▲</span>
+                          )}
+                          {performance_data.class_diff === "lower" && (
+                            <span className="text-red-500 text-xl">▼</span>
+                          )}
+                          {performance_data.class_diff === "same" && (
+                            <span> </span>
+                          )}
+                        </span>
+                        <span className="border border-gray-300 px-2 py-1 rounded flex items-center justify-between">
+                          <span>{performance_data.hcap_range}</span>
+                          {performance_data.rating_range_diff === "higher" && (
+                            <span className="text-green-500 text-xl">▲</span>
+                          )}
+                          {performance_data.rating_range_diff === "lower" && (
+                            <span className="text-red-500 text-xl">▼</span>
+                          )}
+                          {performance_data.rating_range_diff === "same" && (
+                            <span> </span>
+                          )}
                         </span>
                         <span className=" text-md border border-gray-300 px-2 py-1 rounded">
-                          {performance_data.conditions}
+                          {performance_data.age_range}
                         </span>
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.first_place_prize_money}
