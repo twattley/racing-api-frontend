@@ -1,13 +1,28 @@
 import React from "react";
 
-export function HorseDetails({ horse, toggleHorseVisibility, visibleHorses }) {
+export function HorseDetails({
+  horse,
+  toggleHorseVisibility,
+  visibleHorses,
+  onHorseSelect,
+}) {
   return (
     <div key={horse.horse_id} className="mb-2">
       <h2
         className="text-2xl pt-2 font-bold mb-2 cursor-pointer"
         onClick={() => toggleHorseVisibility(horse.horse_id)}
       >
-        <div className="grid grid-cols-[minmax(100px,auto),80px,80px,80px,80px,80px,80px,80px,80px] gap-2">
+        <div className="grid grid-cols-[30px,minmax(100px,auto),80px,80px,80px,80px,80px,80px,80px,80px] gap-2">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Horse selected:", horse.horse_name);
+              onHorseSelect(horse);
+            }}
+          >
+            +
+          </button>
           <span
             className={`border border-gray-300 px-2 py-1 rounded ${
               !visibleHorses[horse.horse_id] ? "bg-gray-200" : ""

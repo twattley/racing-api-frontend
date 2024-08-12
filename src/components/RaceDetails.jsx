@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { HorseDetails } from "./HorseDetails";
 import { PerformanceTable } from "./PerformanceTable";
+import { DutchBetCalculator } from "./DutchBetCalculator";
 
 export function RaceDetails({
   data,
@@ -10,6 +11,7 @@ export function RaceDetails({
   resetVisibility,
 }) {
   const [isAllNotVisible, setIsAllNotVisible] = useState(false);
+  const [selectedHorses, setSelectedHorses] = useState([]);
 
   const toggleHorseVisibility = (horse_id) => {
     setVisibleHorses((prevState) => ({
@@ -34,6 +36,27 @@ export function RaceDetails({
     setIsAllNotVisible(!isAllNotVisible);
   };
 
+  const handleHorseSelect = (horse) => {
+    console.log("handleHorseSelect called with:", horse);
+    if (!selectedHorses.find((h) => h.id === horse.horse_id)) {
+      const newHorse = {
+        id: horse.horse_id,
+        name: horse.horse_name,
+        odds: parseFloat(horse.todays_betfair_win_sp) || 2.0,
+      };
+      console.log("Adding new horse:", newHorse);
+      setSelectedHorses((prevHorses) => [...prevHorses, newHorse]);
+    }
+  };
+
+  const handleRemoveHorse = (horseId) => {
+    setSelectedHorses((prevHorses) =>
+      prevHorses.filter((horse) => horse.id !== horseId)
+    );
+  };
+
+  console.log("Current selectedHorses:", selectedHorses);
+
   return (
     <div className="container mx-auto p-4">
       <button
@@ -50,6 +73,7 @@ export function RaceDetails({
                 horse={horse}
                 toggleHorseVisibility={toggleHorseVisibility}
                 visibleHorses={visibleHorses}
+                onHorseSelect={handleHorseSelect}
               />
               <PerformanceTable
                 horse={horse}
@@ -60,6 +84,10 @@ export function RaceDetails({
           ))}
         </div>
       )}
+      <DutchBetCalculator
+        selectedHorses={selectedHorses}
+        onRemoveHorse={handleRemoveHorse}
+      />
     </div>
   );
 }
