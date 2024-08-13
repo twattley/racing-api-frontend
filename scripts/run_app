@@ -4,7 +4,7 @@ LOG_FILE="/Users/tomwattley/Code/application_logs/racing-api/racing-api-fe.log"
 
 cd "$PROJECT_DIR" || { echo "Error: Project directory not found."; exit 1; }
 
-npm run dev >> "$LOG_FILE" 2>&1 &
+npm run dev
 
 APP_URL="http://localhost:3000/"
 

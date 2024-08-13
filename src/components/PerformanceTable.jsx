@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useRef } from "react";
+import { useFetch } from "../hooks/useFetch";
 
 const getSurfaceColorClass = (surface) => {
   const normalizedSurface = surface.trim().toLowerCase();
@@ -19,7 +20,45 @@ const getSurfaceColorClass = (surface) => {
   }
 };
 
-export function PerformanceTable({ horse, visibleHorses, data }) {
+export function PerformanceTable({
+  horse,
+  visibleHorses,
+  data,
+  todaysRaceDate,
+}) {
+  const [hoverRaceInfo, setHoverRaceInfo] = useState(null);
+  const hoverTimer = useRef(null);
+
+  const {
+    data: raceData,
+    error,
+    loading,
+  } = useFetch(
+    hoverRaceInfo
+      ? `/collateral/form/by-race-id?race_id=${hoverRaceInfo.raceId}&race_date=${hoverRaceInfo.raceDate}&todays_race_date=${todaysRaceDate}`
+      : null
+  );
+
+  const handleMouseEnter = (raceId, raceDate) => {
+    hoverTimer.current = setTimeout(() => {
+      setHoverRaceInfo({ raceId, raceDate });
+    }, 1000); // 1 second delay
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimer.current) {
+      clearTimeout(hoverTimer.current);
+    }
+    setHoverRaceInfo(null);
+  };
+
+  // Log the race data when it's received
+  React.useEffect(() => {
+    if (raceData) {
+      console.log("Race data received:", raceData);
+    }
+  }, [raceData]);
+
   return (
     visibleHorses[horse.horse_id] && (
       <div className="overflow-y-auto" style={{ maxHeight: "640px" }}>
@@ -73,8 +112,21 @@ export function PerformanceTable({ horse, visibleHorses, data }) {
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     <td colSpan="11" className="px-4 py-2 text-xl">
                       <div className="grid grid-cols-[200px,80px,180px,50px,80px,80px,50px,80px,130px] gap-2">
-                        <span className="border border-gray-300 px-2 py-1 rounded">
+                        <span
+                          className="border border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                          onMouseEnter={() =>
+                            handleMouseEnter(
+                              performance_data.race_id,
+                              performance_data.race_date
+                            )
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
                           {performance_data.course}
+                          {loading &&
+                            hoverRaceInfo &&
+                            hoverRaceInfo.raceId === performance_data.race_id &&
+                            " (Loading...)"}
                         </span>
                         <span className="border border-gray-300 px-2 py-1 rounded">
                           {performance_data.distance}

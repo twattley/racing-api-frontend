@@ -89,7 +89,6 @@ export function FeedBackRaces() {
 
   return (
     <div className="container mx-auto p-4">
-      <RaceDatePicker onDateChange={setSelectedDate} />
       <TodaysRaceTimes
         todaysRaceDataType="feedback"
         todaysRaceData={feedbackData}

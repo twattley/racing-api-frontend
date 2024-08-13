@@ -114,6 +114,7 @@ export function RaceDetails({
                 horse={horse}
                 visibleHorses={visibleHorses}
                 data={data}
+                todaysRaceDate={data.race_date}
               />
             </React.Fragment>
           ))}
