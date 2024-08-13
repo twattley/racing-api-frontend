@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HorseDetails } from "./HorseDetails";
 import { PerformanceTable } from "./PerformanceTable";
 import { DutchBetCalculator } from "./DutchBetCalculator";
@@ -12,6 +12,31 @@ export function RaceDetails({
 }) {
   const [isAllNotVisible, setIsAllNotVisible] = useState(false);
   const [selectedHorses, setSelectedHorses] = useState([]);
+  const [timeToOff, setTimeToOff] = useState("");
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const raceTime = new Date(data.race_time);
+      const diff = raceTime - now;
+
+      if (diff > 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeToOff(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+        );
+      } else {
+        setTimeToOff("Historical data");
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [data.race_time]);
 
   const toggleHorseVisibility = (horse_id) => {
     setVisibleHorses((prevState) => ({
@@ -65,6 +90,16 @@ export function RaceDetails({
       >
         {isAllNotVisible ? "Market" : "Filtered"}
       </button>
+      <h1 className="text-2xl font-bold">
+        {(() => {
+          const raceDate = new Date(data.race_time);
+          const raceTime = raceDate.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          return `${raceTime} (${timeToOff})`;
+        })()}
+      </h1>
       {sortedHorses.length > 0 && (
         <div className="mb-4 p-2">
           {sortedHorses.map((horse) => (
