@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useFetch } from "../hooks/useFetch";
+import { RacePopup } from "./RacePopup";
 
 const getSurfaceColorClass = (surface) => {
   const normalizedSurface = surface.trim().toLowerCase();
@@ -26,30 +27,28 @@ export function PerformanceTable({
   data,
   todaysRaceDate,
 }) {
-  const [hoverRaceInfo, setHoverRaceInfo] = useState(null);
-  const hoverTimer = useRef(null);
+  const [activeRaceInfo, setActiveRaceInfo] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   const {
     data: raceData,
     error,
     loading,
   } = useFetch(
-    hoverRaceInfo
-      ? `/collateral/form/by-race-id?race_id=${hoverRaceInfo.raceId}&race_date=${hoverRaceInfo.raceDate}&todays_race_date=${todaysRaceDate}`
+    activeRaceInfo
+      ? `/collateral/form/by-race-id?race_id=${activeRaceInfo.raceId}&race_date=${activeRaceInfo.raceDate}&horse_id=${activeRaceInfo.horseId}&todays_race_date=${todaysRaceDate}`
       : null
   );
 
-  const handleMouseEnter = (raceId, raceDate) => {
-    hoverTimer.current = setTimeout(() => {
-      setHoverRaceInfo({ raceId, raceDate });
-    }, 1000); // 1 second delay
+  const handleClick = (raceId, raceDate, horseId, event) => {
+    event.preventDefault();
+    const rect = event.target.getBoundingClientRect();
+    setPopupPosition({ x: rect.left, y: rect.bottom });
+    setActiveRaceInfo({ raceId, raceDate, horseId });
   };
 
-  const handleMouseLeave = () => {
-    if (hoverTimer.current) {
-      clearTimeout(hoverTimer.current);
-    }
-    setHoverRaceInfo(null);
+  const handleClosePopup = () => {
+    setActiveRaceInfo(null);
   };
 
   // Log the race data when it's received
@@ -61,7 +60,7 @@ export function PerformanceTable({
 
   return (
     visibleHorses[horse.horse_id] && (
-      <div className="overflow-y-auto" style={{ maxHeight: "640px" }}>
+      <div className="overflow-y-auto relative" style={{ maxHeight: "640px" }}>
         <table className="min-w-full border-collapse">
           <thead className="sticky top-0 z-10 bg-gray-800">
             <tr className="bg-gray-800 text-white">
@@ -114,18 +113,21 @@ export function PerformanceTable({
                       <div className="grid grid-cols-[200px,80px,180px,50px,80px,80px,50px,80px,130px] gap-2">
                         <span
                           className="border border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
-                          onMouseEnter={() =>
-                            handleMouseEnter(
+                          onClick={(e) =>
+                            handleClick(
                               performance_data.race_id,
-                              performance_data.race_date
+                              performance_data.race_date,
+                              horse.horse_id,
+                              e
                             )
                           }
-                          onMouseLeave={handleMouseLeave}
                         >
                           {performance_data.course}
                           {loading &&
-                            hoverRaceInfo &&
-                            hoverRaceInfo.raceId === performance_data.race_id &&
+                            activeRaceInfo &&
+                            activeRaceInfo.raceId ===
+                              performance_data.race_id &&
+                            activeRaceInfo.horseId === horse.horse_id &&
                             " (Loading...)"}
                         </span>
                         <span className="border border-gray-300 px-2 py-1 rounded">
@@ -276,6 +278,18 @@ export function PerformanceTable({
               ))}
           </tbody>
         </table>
+        {activeRaceInfo && raceData && !loading && (
+          <div
+            style={{
+              position: "fixed",
+              left: popupPosition.x,
+              top: popupPosition.y,
+              zIndex: 1000,
+            }}
+          >
+            <RacePopup raceData={raceData} onClose={handleClosePopup} />
+          </div>
+        )}
       </div>
     )
   );
