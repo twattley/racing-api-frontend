@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useFetch } from "../hooks/useFetch";
 import { RacePopup } from "./RacePopup";
 
@@ -29,6 +29,7 @@ export function PerformanceTable({
 }) {
   const [activeRaceInfo, setActiveRaceInfo] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const popupRef = useRef(null);
 
   const {
     data: raceData,
@@ -43,13 +44,32 @@ export function PerformanceTable({
   const handleClick = (raceId, raceDate, horseId, event) => {
     event.preventDefault();
     const rect = event.target.getBoundingClientRect();
-    setPopupPosition({ x: rect.left, y: rect.bottom });
-    setActiveRaceInfo({ raceId, raceDate, horseId });
+    if (
+      activeRaceInfo &&
+      activeRaceInfo.raceId === raceId &&
+      activeRaceInfo.horseId === horseId
+    ) {
+      setActiveRaceInfo(null); // Close the popup if clicking the same horse
+    } else {
+      setPopupPosition({ x: rect.left, y: rect.bottom });
+      setActiveRaceInfo({ raceId, raceDate, horseId });
+    }
   };
 
   const handleClosePopup = () => {
     setActiveRaceInfo(null);
   };
+  useEffect(() => {
+    if (popupRef.current && activeRaceInfo) {
+      const popupRect = popupRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      if (popupRect.bottom > viewportHeight) {
+        const newY = Math.max(0, viewportHeight - popupRect.height - 20); // 20px padding
+        setPopupPosition((prev) => ({ ...prev, y: newY }));
+      }
+    }
+  }, [activeRaceInfo, raceData]);
 
   // Log the race data when it's received
   React.useEffect(() => {
@@ -112,7 +132,14 @@ export function PerformanceTable({
                     <td colSpan="11" className="px-4 py-2 text-xl">
                       <div className="grid grid-cols-[200px,80px,180px,50px,80px,80px,50px,80px,130px] gap-2">
                         <span
-                          className="border border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200"
+                          className={`border border-gray-300 px-2 py-1 rounded cursor-pointer hover:bg-gray-200 ${
+                            activeRaceInfo &&
+                            activeRaceInfo.raceId ===
+                              performance_data.race_id &&
+                            activeRaceInfo.horseId === horse.horse_id
+                              ? "bg-blue-200"
+                              : ""
+                          }`}
                           onClick={(e) =>
                             handleClick(
                               performance_data.race_id,
@@ -280,11 +307,14 @@ export function PerformanceTable({
         </table>
         {activeRaceInfo && raceData && !loading && (
           <div
+            ref={popupRef}
             style={{
               position: "fixed",
               left: popupPosition.x,
               top: popupPosition.y,
               zIndex: 1000,
+              maxHeight: "80vh",
+              overflowY: "auto",
             }}
           >
             <RacePopup raceData={raceData} onClose={handleClosePopup} />

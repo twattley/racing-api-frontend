@@ -198,91 +198,6 @@ const generateSingleHorseChartData = (selectedHorse) => {
   };
 };
 
-const config = {
-  type: "line",
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "right",
-      },
-      title: {
-        display: true,
-        text: "Ratings",
-        font: {
-          size: 26,
-        },
-      },
-      zoom: {
-        pan: {
-          enabled: false, // Disable panning
-        },
-        zoom: {
-          wheel: {
-            enabled: false, // Disable zooming with the mouse wheel
-          },
-          pinch: {
-            enabled: false, // Disable zooming with pinch gestures
-          },
-          mode: "xy",
-        },
-      },
-      annotation: {
-        annotations: {},
-      },
-    },
-    scales: {
-      x: {
-        type: "time",
-        time: {
-          unit: "month",
-        },
-        title: {
-          display: true,
-          text: "Date",
-        },
-        ticks: {
-          autoSkip: true,
-          maxRotation: 45,
-          minRotation: 45,
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Value",
-        },
-      },
-    },
-    hover: {
-      mode: "nearest",
-      intersect: true,
-    },
-    onHover: (event, chartElement) => {
-      const chart = chartRef.current;
-      if (chart) {
-        const datasets = chart.data.datasets;
-        if (chartElement.length) {
-          const datasetIndex = chartElement[0].datasetIndex;
-          datasets.forEach((dataset, index) => {
-            dataset.borderWidth = index === datasetIndex ? 3 : 1;
-            dataset.borderColor =
-              index === datasetIndex
-                ? dataset.originalBorderColor
-                : Utils.transparentize(dataset.originalBorderColor, 0.5);
-          });
-        } else {
-          datasets.forEach((dataset) => {
-            dataset.borderWidth = 1;
-            dataset.borderColor = dataset.originalBorderColor;
-          });
-        }
-        chart.update();
-      }
-    },
-  },
-};
-
 export function Graph({ data, filter, visibleHorses, selectedHorse }) {
   const chartRef = useRef(null);
   const [annotations, setAnnotations] = useState({});
@@ -302,63 +217,136 @@ export function Graph({ data, filter, visibleHorses, selectedHorse }) {
   const q1Rating = sortedRatings[Math.floor(sortedRatings.length / 4)];
   const q3Rating = sortedRatings[Math.floor((sortedRatings.length * 3) / 4)];
 
-  // Add annotations for median and quartiles
-  const ratingAnnotations = {
-    q3Rating: {
-      type: "line",
-      yMin: q3Rating,
-      yMax: q3Rating,
-      borderColor: "orange",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      label: {
-        content: "Q3 Rating",
-        enabled: true,
-        position: "end",
+  useEffect(() => {
+    const ratingAnnotations = {
+      q3Rating: {
+        type: "line",
+        yMin: q3Rating,
+        yMax: q3Rating,
+        borderColor: "orange",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        label: {
+          content: "Q3 Rating",
+          enabled: true,
+          position: "end",
+        },
       },
-    },
-    medianRating: {
-      type: "line",
-      yMin: medianRating,
-      yMax: medianRating,
-      borderColor: "blue",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      label: {
-        content: "Median Rating",
-        enabled: true,
-        position: "end",
+      medianRating: {
+        type: "line",
+        yMin: medianRating,
+        yMax: medianRating,
+        borderColor: "blue",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        label: {
+          content: "Median Rating",
+          enabled: true,
+          position: "end",
+        },
       },
-    },
-    q1Rating: {
-      type: "line",
-      yMin: q1Rating,
-      yMax: q1Rating,
-      borderColor: "purple",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      label: {
-        content: "Q1 Rating",
-        enabled: true,
-        position: "end",
+      q1Rating: {
+        type: "line",
+        yMin: q1Rating,
+        yMax: q1Rating,
+        borderColor: "purple",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        label: {
+          content: "Q1 Rating",
+          enabled: true,
+          position: "end",
+        },
+      },
+    };
+
+    setAnnotations(ratingAnnotations);
+  }, [medianRating, q1Rating, q3Rating, filter]);
+
+  const config = {
+    type: "line",
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "right",
+        },
+        title: {
+          display: true,
+          text: "Ratings",
+          font: {
+            size: 26,
+          },
+        },
+        zoom: {
+          pan: {
+            enabled: false,
+          },
+          zoom: {
+            wheel: {
+              enabled: false,
+            },
+            pinch: {
+              enabled: false,
+            },
+            mode: "xy",
+          },
+        },
+        annotation: {
+          annotations: annotations,
+        },
+      },
+      scales: {
+        x: {
+          type: "time",
+          time: {
+            unit: "month",
+          },
+          title: {
+            display: true,
+            text: "Date",
+          },
+          ticks: {
+            autoSkip: true,
+            maxRotation: 45,
+            minRotation: 45,
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Value",
+          },
+        },
+      },
+      hover: {
+        mode: "nearest",
+        intersect: true,
+      },
+      onHover: (event, chartElement) => {
+        const chart = chartRef.current;
+        if (chart) {
+          const datasets = chart.data.datasets;
+          if (chartElement.length) {
+            const datasetIndex = chartElement[0].datasetIndex;
+            datasets.forEach((dataset, index) => {
+              dataset.borderWidth = index === datasetIndex ? 3 : 1;
+              dataset.borderColor =
+                index === datasetIndex
+                  ? dataset.originalBorderColor
+                  : Utils.transparentize(dataset.originalBorderColor, 0.5);
+            });
+          } else {
+            datasets.forEach((dataset) => {
+              dataset.borderWidth = 1;
+              dataset.borderColor = dataset.originalBorderColor;
+            });
+          }
+          chart.update();
+        }
       },
     },
   };
-
-  useEffect(() => {
-    setAnnotations((prevAnnotations) => ({
-      ...prevAnnotations,
-      ...ratingAnnotations,
-    }));
-  }, [medianRating, q1Rating, q3Rating]);
-
-  useEffect(() => {
-    const chart = chartRef.current;
-    if (chart) {
-      chart.options.plugins.annotation.annotations = annotations;
-      chart.update();
-    }
-  }, [annotations]);
 
   return (
     <div>
