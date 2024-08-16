@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useRaceData } from "../../hooks/useRaceData";
 import { RaceDetails } from "../../components/RaceDetails";
@@ -15,6 +15,13 @@ export function TodaysRaceWrapper() {
     sortedHorses,
     resetVisibility,
   } = useRaceData(`/today/todays-races/by-race-id?race_id=${race_id}`);
+
+  const [selectedGraphHorse, setSelectedGraphHorse] = useState(null);
+
+  const handleGraphHorseSelect = (horse) => {
+    setSelectedGraphHorse(horse);
+    console.log("Graph horse selected:", horse.horse_name);
+  };
 
   if (raceDataLoading) {
     return <p>Loading data...</p>;
@@ -35,6 +42,7 @@ export function TodaysRaceWrapper() {
             setVisibleHorses={setVisibleHorses}
             sortedHorses={sortedHorses}
             resetVisibility={resetVisibility}
+            onGraphHorseSelect={handleGraphHorseSelect}
           />
         </div>
         <div className="w-1/2 px-4 py-2 bg-white rounded-lg shadow sticky top-0 h-screen">
@@ -43,6 +51,7 @@ export function TodaysRaceWrapper() {
             data={raceData}
             visibleHorses={visibleHorses}
             setVisibleHorses={setVisibleHorses}
+            selectedGraphHorse={selectedGraphHorse}
           />
         </div>
       </div>

@@ -199,6 +199,7 @@ const generateSingleHorseChartData = (selectedHorse) => {
 };
 
 export function Graph({ data, filter, visibleHorses, selectedHorse }) {
+  console.log("Selected Horse in Graph:", selectedHorse);
   const chartRef = useRef(null);
   const [annotations, setAnnotations] = useState({});
 
@@ -270,6 +271,9 @@ export function Graph({ data, filter, visibleHorses, selectedHorse }) {
       plugins: {
         legend: {
           position: "right",
+        },
+        tooltip: {
+          enabled: false, // Disable the tooltip
         },
         title: {
           display: true,

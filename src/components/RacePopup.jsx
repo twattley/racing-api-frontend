@@ -4,9 +4,19 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
   if (!raceData || !raceData.horse_collateral_data) return null;
 
   const handlePopupClick = (e) => {
-    // Prevent the click from propagating to parent elements
     e.stopPropagation();
     onClose();
+  };
+
+  const isImportantResult = (form) => {
+    const isFirstPosition = form.finishing_position === 1;
+    const isCloseFinish = parseFloat(form.total_distance_beaten) < 2;
+    const isSecondInLargeField =
+      form.finishing_position < 4 && parseInt(form.number_of_runners, 10) > 12;
+
+    console.log("Is second in large field:", isSecondInLargeField);
+
+    return isFirstPosition || isCloseFinish || isSecondInLargeField;
   };
 
   return (
@@ -21,16 +31,7 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Horse
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              SP
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              OR
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Dist Diff
+              Collateral Form
             </th>
           </tr>
         </thead>
@@ -42,17 +43,10 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
                   horse.horse_id === activeHorseId ? "bg-blue-100" : ""
                 }
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {horse.horse_name}
-                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {horse.betfair_win_sp}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {horse.official_rating}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {horse.distance_difference}
+                  <b>
+                    <i>{horse.distance_difference}</i>
+                  </b>
                 </td>
               </tr>
               <tr>
@@ -61,25 +55,13 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
                     <thead className="bg-gray-100">
                       <tr>
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Cls
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Conditions
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          SP
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Ptn
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Btn
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          OR
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Speed
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Rating
@@ -90,50 +72,32 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
                       {horse.collateral_form_data.map((form, index) => (
                         <tr
                           key={index}
-                          className={
-                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                          }
+                          className={`
+                            ${
+                              isImportantResult(form)
+                                ? "bg-blue-600 text-white font-bold"
+                                : index % 2 === 0
+                                ? "bg-gray-50"
+                                : "bg-white"
+                            }
+                          `}
                         >
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                            {form.race_class}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-4 py-2 whitespace-nowrap text-sm">
                             {form.conditions}
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                            {form.betfair_win_sp}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-4 py-2 whitespace-nowrap text-sm">
                             {form.finishing_position} / {form.number_of_runners}
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-4 py-2 whitespace-nowrap text-sm">
                             {form.total_distance_beaten}
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                            {form.official_rating}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                            {form.speed_figure}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-4 py-2 whitespace-nowrap text-sm">
                             {form.rating}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="4" className="px-6 py-4 text-sm text-gray-500">
-                  <strong>Main Race Comment:</strong>{" "}
-                  {horse.collateral_form_data[0].main_race_comment}
-                </td>
-              </tr>
-              <tr>
-                <td colSpan="4" className="px-6 py-4 text-sm text-gray-500">
-                  <strong>TF Comment:</strong>{" "}
-                  {horse.collateral_form_data[0].tf_comment}
                 </td>
               </tr>
             </React.Fragment>

@@ -4,7 +4,8 @@ export function HorseDetails({
   horse,
   toggleHorseVisibility,
   visibleHorses,
-  onHorseSelect,
+  dutchHorseSelect,
+  graphHorseSelect,
 }) {
   return (
     <div key={horse.horse_id} className="mb-2">
@@ -12,16 +13,31 @@ export function HorseDetails({
         className="text-2xl pt-2 font-bold mb-2 cursor-pointer"
         onClick={() => toggleHorseVisibility(horse.horse_id)}
       >
-        <div className="grid grid-cols-[30px,minmax(100px,auto),80px,80px,80px,80px,80px,80px,80px,80px] gap-2">
+        <div className="grid grid-cols-[30px,30px,minmax(100px,auto),80px,80px,80px,80px,80px,80px,80px,80px] gap-2">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+            className="bg-gray-400 hover:bg-gray-900 text-white font-bold py-1 px-2 rounded"
             onClick={(e) => {
               e.stopPropagation();
               console.log("Horse selected:", horse.horse_name);
-              onHorseSelect(horse);
+              dutchHorseSelect(horse);
             }}
           >
-            +
+            D
+          </button>
+          <button
+            className="bg-gray-400 hover:bg-gray-900 text-white font-bold py-1 px-2 rounded"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Horse selected:", horse.horse_name);
+              if (typeof graphHorseSelect === "function") {
+                // Add this check
+                graphHorseSelect(horse);
+              } else {
+                console.error("graphHorseSelect is not a function");
+              }
+            }}
+          >
+            G
           </button>
           <span
             className={`border border-gray-300 px-2 py-1 rounded ${

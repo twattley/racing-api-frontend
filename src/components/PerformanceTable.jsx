@@ -71,13 +71,6 @@ export function PerformanceTable({
     }
   }, [activeRaceInfo, raceData]);
 
-  // Log the race data when it's received
-  React.useEffect(() => {
-    if (raceData) {
-      console.log("Race data received:", raceData);
-    }
-  }, [raceData]);
-
   return (
     visibleHorses[horse.horse_id] && (
       <div className="overflow-y-auto relative" style={{ maxHeight: "640px" }}>

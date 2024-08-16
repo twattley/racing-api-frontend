@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Graph } from "./Graph";
 
-export function RaceGraphs({ data, visibleHorses }) {
+export function RaceGraphs({ data, visibleHorses, selectedGraphHorse }) {
   const [filter, setFilter] = useState("rating");
-  const [selectedHorseId, setSelectedHorseId] = useState(null);
+
+  useEffect(() => {
+    console.log("Selected Horse in RaceGraphs:", selectedGraphHorse);
+  }, [selectedGraphHorse]);
 
   if (!data) {
     return <p>Loading data...</p>;
   }
-
-  const selectedHorse = data.horse_data.find(
-    (horse) => horse.horse_id === selectedHorseId
-  );
 
   const handleFilterChange = (event) => {
     const { name, checked } = event.target;
@@ -55,32 +54,12 @@ export function RaceGraphs({ data, visibleHorses }) {
             <span className="ml-2">SPEED</span>
           </label>
         </div>
-        <div>
-          <label htmlFor="horse" className="mr-2 font-bold">
-            Select Horse:
-          </label>
-          <select
-            id="horse"
-            value={selectedHorseId || ""}
-            onChange={(e) => setSelectedHorseId(parseInt(e.target.value, 10))}
-            className="p-2 border rounded-md"
-          >
-            <option value="" disabled>
-              Select a horse
-            </option>
-            {data.horse_data.map((horse) => (
-              <option key={horse.horse_id} value={horse.horse_id}>
-                {horse.horse_name}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
       <Graph
         data={data}
         filter={filter}
         visibleHorses={visibleHorses}
-        selectedHorse={selectedHorse}
+        selectedHorse={selectedGraphHorse}
       />
     </div>
   );

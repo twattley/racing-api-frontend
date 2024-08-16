@@ -9,6 +9,7 @@ export function RaceDetails({
   setVisibleHorses,
   sortedHorses,
   resetVisibility,
+  onGraphHorseSelect,
 }) {
   const [isAllNotVisible, setIsAllNotVisible] = useState(false);
   const [selectedHorses, setSelectedHorses] = useState([]);
@@ -39,6 +40,7 @@ export function RaceDetails({
   }, [data.race_time]);
 
   const toggleHorseVisibility = (horse_id) => {
+    console.log("toggleHorseVisibility called with:", horse_id);
     setVisibleHorses((prevState) => ({
       ...prevState,
       [horse_id]: !prevState[horse_id],
@@ -61,8 +63,8 @@ export function RaceDetails({
     setIsAllNotVisible(!isAllNotVisible);
   };
 
-  const handleHorseSelect = (horse) => {
-    console.log("handleHorseSelect called with:", horse);
+  const handleDutchHorseSelect = (horse) => {
+    console.log("handleDutchHorseSelect called with:", horse);
     if (!selectedHorses.find((h) => h.id === horse.horse_id)) {
       const newHorse = {
         id: horse.horse_id,
@@ -79,8 +81,6 @@ export function RaceDetails({
       prevHorses.filter((horse) => horse.id !== horseId)
     );
   };
-
-  console.log("Current selectedHorses:", selectedHorses);
 
   return (
     <div className="container mx-auto p-4">
@@ -108,7 +108,8 @@ export function RaceDetails({
                 horse={horse}
                 toggleHorseVisibility={toggleHorseVisibility}
                 visibleHorses={visibleHorses}
-                onHorseSelect={handleHorseSelect}
+                dutchHorseSelect={handleDutchHorseSelect}
+                graphHorseSelect={onGraphHorseSelect}
               />
               <PerformanceTable
                 horse={horse}
