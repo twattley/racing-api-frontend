@@ -16,6 +16,7 @@ import {
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom";
 import annotationPlugin from "chartjs-plugin-annotation";
+import { mainChartConfig, singleHorseChartConfig } from "./chartConfigs";
 
 ChartJS.register(
   CategoryScale,
@@ -199,16 +200,15 @@ const generateSingleHorseChartData = (selectedHorse) => {
 };
 
 export function Graph({ data, filter, visibleHorses, selectedHorse }) {
-  console.log("Selected Horse in Graph:", selectedHorse);
-  const chartRef = useRef(null);
+  const mainChartRef = useRef(null);
+  const singleHorseChartRef = useRef(null);
   const [annotations, setAnnotations] = useState({});
 
   const chartData = generateChartData(data, filter, visibleHorses);
   const singleHorseChartData = selectedHorse
-    ? generateSingleHorseChartData(selectedHorse)
-    : { labels: [], datasets: [] };
+    ? generateSingleHorseChartData(selectedHorse, filter)
+    : null;
 
-  // Calculate median and quartiles
   const allRatings = data.horse_data
     .flatMap((horse) => horse.performance_data.map((d) => d[filter]))
     .filter((rating) => rating !== null && rating !== undefined);
@@ -264,99 +264,40 @@ export function Graph({ data, filter, visibleHorses, selectedHorse }) {
     setAnnotations(ratingAnnotations);
   }, [medianRating, q1Rating, q3Rating, filter]);
 
-  const config = {
-    type: "line",
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "right",
-        },
-        tooltip: {
-          enabled: false, // Disable the tooltip
-        },
-        title: {
-          display: true,
-          text: "Ratings",
-          font: {
-            size: 26,
-          },
-        },
-        zoom: {
-          pan: {
-            enabled: false,
-          },
-          zoom: {
-            wheel: {
-              enabled: false,
-            },
-            pinch: {
-              enabled: false,
-            },
-            mode: "xy",
-          },
-        },
-        annotation: {
-          annotations: annotations,
-        },
+  const mainChartOptions = {
+    ...mainChartConfig.options,
+    plugins: {
+      ...mainChartConfig.options.plugins,
+      annotation: {
+        annotations: annotations,
       },
-      scales: {
-        x: {
-          type: "time",
-          time: {
-            unit: "month",
-          },
-          title: {
-            display: true,
-            text: "Date",
-          },
-          ticks: {
-            autoSkip: true,
-            maxRotation: 45,
-            minRotation: 45,
-          },
-        },
-        y: {
-          title: {
-            display: true,
-            text: "Value",
-          },
-        },
-      },
-      hover: {
-        mode: "nearest",
-        intersect: true,
-      },
-      onHover: (event, chartElement) => {
-        const chart = chartRef.current;
-        if (chart) {
-          const datasets = chart.data.datasets;
-          if (chartElement.length) {
-            const datasetIndex = chartElement[0].datasetIndex;
-            datasets.forEach((dataset, index) => {
-              dataset.borderWidth = index === datasetIndex ? 3 : 1;
-              dataset.borderColor =
-                index === datasetIndex
-                  ? dataset.originalBorderColor
-                  : Utils.transparentize(dataset.originalBorderColor, 0.5);
-            });
-          } else {
-            datasets.forEach((dataset) => {
-              dataset.borderWidth = 1;
-              dataset.borderColor = dataset.originalBorderColor;
-            });
-          }
-          chart.update();
-        }
+    },
+  };
+
+  const singleHorseChartOptions = {
+    ...singleHorseChartConfig.options,
+    plugins: {
+      ...singleHorseChartConfig.options.plugins,
+      title: {
+        ...singleHorseChartConfig.options.plugins.title,
+        text: selectedHorse
+          ? `${selectedHorse.horse_name} - ${
+              filter.charAt(0).toUpperCase() + filter.slice(1)
+            }`
+          : "",
       },
     },
   };
 
   return (
     <div>
-      <Line ref={chartRef} data={chartData} options={config.options} />
-      {selectedHorse && (
-        <Line data={singleHorseChartData} options={config.options} />
+      <Line ref={mainChartRef} data={chartData} options={mainChartOptions} />
+      {singleHorseChartData && (
+        <Line
+          ref={singleHorseChartRef}
+          data={singleHorseChartData}
+          options={singleHorseChartOptions}
+        />
       )}
     </div>
   );
