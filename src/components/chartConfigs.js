@@ -28,35 +28,33 @@ const baseConfig = {
   options: {
     responsive: true,
     plugins: {
-      legend: {
-        position: 'right',
-      },
-      tooltip: {
-        enabled: false, // Disable the tooltip
-      },
-      title: {
-        display: true,
-        text: 'Ratings',
-        font: {
-          size: 26,
-        },
-      },
+      // ... (other plugin configurations)
       zoom: {
+        limits: {
+          x: {min: 'original', max: 'original'},
+          y: {min: 'original', max: 'original'}
+        },
         pan: {
-          enabled: false,
+          enabled: true,
+          mode: 'xy',
+          threshold: 10,
         },
         zoom: {
           wheel: {
             enabled: false,
           },
           pinch: {
-            enabled: false,
+            enabled: true
           },
           mode: 'xy',
-        },
-      },
-      annotation: {
-        annotations: {}, // This will be dynamically updated
+          drag: {
+            enabled: true,
+            borderColor: 'rgba(54, 162, 235, 0.3)',
+            borderWidth: 1,
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            animationDuration: 1000
+          },
+        }
       },
     },
     scales: {

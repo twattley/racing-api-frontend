@@ -280,24 +280,39 @@ export function Graph({ data, filter, visibleHorses, selectedHorse }) {
       ...singleHorseChartConfig.options.plugins,
       title: {
         ...singleHorseChartConfig.options.plugins.title,
-        text: selectedHorse
-          ? `${selectedHorse.horse_name} - ${
-              filter.charAt(0).toUpperCase() + filter.slice(1)
-            }`
-          : "",
+        display: true,
+        text: selectedHorse ? selectedHorse.horse_name : "",
+        font: {
+          size: 28, // Increased font size
+          weight: "bold",
+        },
+        padding: {
+          top: 10,
+          bottom: 30, // Add some padding below the title
+        },
       },
     },
   };
 
+  const handleDoubleClick = (chartRef) => {
+    if (chartRef.current) {
+      chartRef.current.resetZoom();
+    }
+  };
+
   return (
     <div>
-      <Line ref={mainChartRef} data={chartData} options={mainChartOptions} />
+      <div onDoubleClick={() => handleDoubleClick(mainChartRef)}>
+        <Line ref={mainChartRef} data={chartData} options={mainChartOptions} />
+      </div>
       {singleHorseChartData && (
-        <Line
-          ref={singleHorseChartRef}
-          data={singleHorseChartData}
-          options={singleHorseChartOptions}
-        />
+        <div onDoubleClick={() => handleDoubleClick(singleHorseChartRef)}>
+          <Line
+            ref={singleHorseChartRef}
+            data={singleHorseChartData}
+            options={singleHorseChartOptions}
+          />
+        </div>
       )}
     </div>
   );
