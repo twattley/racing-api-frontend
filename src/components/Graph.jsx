@@ -260,6 +260,9 @@ export function Graph({ data, filter, visibleHorses, selectedHorse }) {
       annotation: {
         annotations: annotations,
       },
+      tooltip: {
+        enabled: false,
+      },
     },
   };
 
