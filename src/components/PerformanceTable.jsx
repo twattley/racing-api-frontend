@@ -30,6 +30,14 @@ export function PerformanceTable({
   const [activeRaceInfo, setActiveRaceInfo] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const popupRef = useRef(null);
+  const [expandedComments, setExpandedComments] = useState({});
+
+  const toggleComment = (uniqueId) => {
+    setExpandedComments((prev) => ({
+      ...prev,
+      [uniqueId]: !prev[uniqueId],
+    }));
+  };
 
   const {
     data: raceData,
@@ -285,15 +293,23 @@ export function PerformanceTable({
                     </td>
                   </tr>
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                    <td className="px-4 py-2" colSpan={8}>
-                      {performance_data.main_race_comment}
-                    </td>
-                  </tr>
-                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                    <td className="px-4 py-2" colSpan={8}>
+                    <td
+                      className="px-4 py-2 cursor-pointer"
+                      colSpan={8}
+                      onClick={() => toggleComment(performance_data.unique_id)}
+                    >
                       {performance_data.tf_comment}
                     </td>
                   </tr>
+                  {expandedComments[performance_data.unique_id] && (
+                    <tr
+                      className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+                    >
+                      <td className="px-4 py-2 pl-8" colSpan={8}>
+                        {performance_data.main_race_comment}
+                      </td>
+                    </tr>
+                  )}
                 </React.Fragment>
               ))}
           </tbody>
