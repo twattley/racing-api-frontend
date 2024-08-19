@@ -1,15 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 
-export function RaceDatePicker({ onDateChange }) {
-  const [selectedDate, setSelectedDate] = useState(null); // No default date
-
+export function RaceDatePicker({ onDateChange, selectedDate }) {
   const handleChange = (date) => {
-    setSelectedDate(date);
     const formattedDate = date ? format(date, "yyyy-MM-dd") : null;
-    onDateChange(formattedDate); // Call the callback with the formatted date
+    onDateChange(formattedDate);
   };
 
   return (
@@ -22,5 +19,3 @@ export function RaceDatePicker({ onDateChange }) {
     />
   );
 }
-
-

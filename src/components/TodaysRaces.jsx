@@ -43,11 +43,6 @@ export function TodaysRaceTimes({
 
   return (
     <div className="container mx-auto p-4">
-      <TodaysRaceFilters
-        filters={filters}
-        setFilters={setFilters}
-        filterOptions={filterOptions}
-      />
       {todaysRaceData.map((raceDay, index) => (
         <div
           key={index}
@@ -74,7 +69,7 @@ export function TodaysRaceTimes({
                         (filters.raceClass === "" ||
                           race.race_class === filters.raceClass) &&
                         (filters.distance === "" ||
-                          race.distance === filters.distance) 
+                          race.distance === filters.distance)
                     )
                     .map((race) => (
                       <div key={race.race_id} className="group relative mb-1">

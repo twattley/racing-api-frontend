@@ -90,19 +90,13 @@ const generateChartData = (raceData, filter, visibleHorses) => {
           );
           return dataPoint ? dataPoint[filter] : null;
         }),
-        pointBackgroundColor: labels.map((label) => {
-          const dataPoint = horse.performance_data?.find(
-            (data) => data.race_date === label
-          );
-          return dataPoint
-            ? getSurfaceColorClass(dataPoint.surface)
-            : "rgba(0,0,0,0)";
-        }),
+        pointBackgroundColor: color, // Use the line color for point fill
+        pointBorderColor: color, // Use the line color for point border
         borderColor: color,
         backgroundColor: Utils.transparentize(color, 0.5),
         spanGaps: true,
-        pointRadius: 7, // Increase point size
-        pointHoverRadius: 9, // Increase point hover size
+        pointRadius: 4, // Slightly reduced point size
+        pointHoverRadius: 6, // Slightly reduced hover size
         originalBorderColor: color, // Store original color
       };
     });
@@ -130,20 +124,15 @@ const generateSingleHorseChartData = (selectedHorse) => {
         );
         return dataPoint ? dataPoint.official_rating : null;
       }),
-      pointBackgroundColor: labels.map((label) => {
-        const dataPoint = selectedHorse.performance_data.find(
-          (data) => data.race_date === label
-        );
-        return dataPoint
-          ? getSurfaceColorClass(dataPoint.surface)
-          : "rgba(0,0,0,0)";
-      }),
-      borderColor: "rgb(75, 192, 192)", // Green
-      backgroundColor: Utils.transparentize("rgb(75, 192, 192)", 0.5),
+      pointBackgroundColor: "rgb(0, 0, 0)", // Black dots
+      pointBorderColor: "rgb(0, 0, 0)", // Black border for dots
+      borderColor: "rgb(0, 0, 0)", // Black line
+      backgroundColor: "rgba(0, 0, 0, 0.1)", // Very light black for area under the line
       spanGaps: true,
-      pointRadius: 7, // Increase point size
-      pointHoverRadius: 9, // Increase point hover size
-      originalBorderColor: "rgb(75, 192, 192)", // Store original color
+      pointRadius: 3, // Much smaller points
+      pointHoverRadius: 4, // Slightly larger on hover, but still small
+      borderDash: [5, 5], // Dashed line
+      borderWidth: 2,
     },
     {
       label: `Rating`,
@@ -161,12 +150,12 @@ const generateSingleHorseChartData = (selectedHorse) => {
           ? getSurfaceColorClass(dataPoint.surface)
           : "rgba(0,0,0,0)";
       }),
-      borderColor: "rgb(54, 162, 235)", // Blue
-      backgroundColor: Utils.transparentize("rgb(54, 162, 235)", 0.5),
+      borderColor: "rgb(255, 99, 132)", // Red
+      backgroundColor: Utils.transparentize("rgb(255, 99, 132)", 0.5),
       spanGaps: true,
-      pointRadius: 7, // Increase point size
-      pointHoverRadius: 9, // Increase point hover size
-      originalBorderColor: "rgb(54, 162, 235)", // Store original color
+      pointRadius: 7,
+      pointHoverRadius: 9,
+      originalBorderColor: "rgb(54, 162, 235)",
     },
     {
       label: `Speed Figure`,
@@ -184,12 +173,12 @@ const generateSingleHorseChartData = (selectedHorse) => {
           ? getSurfaceColorClass(dataPoint.surface)
           : "rgba(0,0,0,0)";
       }),
-      borderColor: "rgb(255, 206, 86)", // Yellow
+      borderColor: "rgb(54, 162, 256)", // Blue
       backgroundColor: Utils.transparentize("rgb(255, 206, 86)", 0.5),
       spanGaps: true,
-      pointRadius: 7, // Increase point size
-      pointHoverRadius: 9, // Increase point hover size
-      originalBorderColor: "rgb(255, 206, 86)", // Store original color
+      pointRadius: 7,
+      pointHoverRadius: 9,
+      originalBorderColor: "rgb(255, 206, 86)",
     },
   ];
 

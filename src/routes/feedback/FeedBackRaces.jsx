@@ -40,7 +40,7 @@ export function FeedBackRaces() {
     error: postError,
     loading: postLoading,
     postData,
-  } = usePost("/feedback/todays-races/selected-date", {}); // Use usePost hook
+  } = usePost("/feedback/todays-races/selected-date", {});
 
   useEffect(() => {
     if (feedbackData) {
@@ -67,6 +67,10 @@ export function FeedBackRaces() {
     }));
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date ? new Date(date) : null);
+  };
+
   if (
     currentDateLoading ||
     (feedbackDataLoading && !formattedDate) ||
@@ -89,6 +93,10 @@ export function FeedBackRaces() {
 
   return (
     <div className="container mx-auto p-4">
+      <RaceDatePicker
+        onDateChange={handleDateChange}
+        selectedDate={selectedDate}
+      />
       <TodaysRaceTimes
         todaysRaceDataType="feedback"
         todaysRaceData={feedbackData}
