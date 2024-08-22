@@ -64,10 +64,11 @@ const baseConfig = {
           unit: 'month',
         },
         title: {
-          display: true,
+          display: false,
           text: 'Date',
         },
         ticks: {
+          display: false,
           autoSkip: true,
           maxRotation: 45,
           minRotation: 45,
@@ -126,7 +127,7 @@ export const singleHorseChartConfig = {
     plugins: {
       ...baseConfig.options.plugins,
       legend: {
-        display: true,
+        display: false,
         position: 'top',
       },
       title: {
