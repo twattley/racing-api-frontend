@@ -8,15 +8,25 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
     onClose();
   };
 
+  console.log(raceData);
   const isImportantResult = (form) => {
-    const isFirstPosition = form.finishing_position === 1;
-    const isCloseFinish = parseFloat(form.total_distance_beaten) < 2;
-    const isSecondInLargeField =
-      form.finishing_position < 4 && parseInt(form.number_of_runners, 10) > 12;
+    const finishingPosition = form.finishing_position.toString();
+    const totalDistanceBeaten = parseFloat(form.total_distance_beaten);
+    const numberOfRunners = parseInt(form.number_of_runners, 10);
 
-    console.log("Is second in large field:", isSecondInLargeField);
+    const isTopTwoFinish = ["1", "2"].includes(finishingPosition);
+    const isCloseFinish = totalDistanceBeaten < 2;
+    const isTopThreeInSmallField =
+      ["1", "2", "3"].includes(finishingPosition) && numberOfRunners >= 12;
+    const isTopFourInLargeField =
+      ["1", "2", "3", "4"].includes(finishingPosition) && numberOfRunners >= 16;
 
-    return isFirstPosition || isCloseFinish || isSecondInLargeField;
+    return (
+      isTopTwoFinish ||
+      isCloseFinish ||
+      isTopThreeInSmallField ||
+      isTopFourInLargeField
+    );
   };
 
   return (
@@ -26,6 +36,13 @@ export function RacePopup({ raceData, onClose, activeHorseId }) {
     >
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Race Details</h2>
+        <h3 className="text-xl font-bold">
+          | <b>{raceData.average_collateral_rating}</b> |
+        </h3>
+        <h3 className="text-xl font-bold">
+          | {raceData.important_result_count} /{" "}
+          {raceData.valid_collateral_performance_count} |
+        </h3>
       </div>
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
