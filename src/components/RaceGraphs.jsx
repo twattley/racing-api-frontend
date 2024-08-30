@@ -26,16 +26,6 @@ export function RaceGraphs({ data, visibleHorses, selectedGraphHorse }) {
           <label className="inline-flex items-center">
             <input
               type="checkbox"
-              name="official_rating"
-              checked={filter === "official_rating"}
-              onChange={handleFilterChange}
-              className="form-checkbox h-5 w-5 text-blue-600"
-            />
-            <span className="ml-2">OFFICIAL RATING</span>
-          </label>
-          <label className="inline-flex items-center">
-            <input
-              type="checkbox"
               name="rating"
               checked={filter === "rating"}
               onChange={handleFilterChange}
