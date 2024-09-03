@@ -8,7 +8,7 @@ export function useRaceData(url) {
 
   const resetVisibility = () => {
     if (raceData && Array.isArray(raceData.horse_data)) {
-      const outsiders = raceData.horse_data.filter(horse => horse.todays_betfair_win_sp > 16).map(horse => horse.horse_id);
+      const outsiders = raceData.horse_data.filter(horse => horse.todays_betfair_win_sp > 20).map(horse => horse.horse_id);
       const longBreak = raceData.horse_data.filter(horse => horse.todays_days_since_last_ran > 52).map(horse => horse.horse_id);
       const shortBreak = raceData.horse_data.filter(horse => horse.todays_days_since_last_ran <= 6).map(horse => horse.horse_id);
       

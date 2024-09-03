@@ -106,7 +106,7 @@ export const mainChartConfig = {
             dataset.borderColor = dataset.originalBorderColor;
           } else {
             dataset.borderWidth = 1;
-            dataset.borderColor = Utils.transparentize(dataset.originalBorderColor, 0.3);
+            dataset.borderColor = Utils.transparentize(dataset.originalBorderColor, 0.1);
           }
         });
       } else {

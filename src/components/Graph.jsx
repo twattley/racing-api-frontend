@@ -117,6 +117,24 @@ const generateSingleHorseChartData = (selectedHorse) => {
 
   const datasets = [
     {
+      label: `Official Rating`,
+      data: labels.map((label) => {
+        const dataPoint = selectedHorse.performance_data.find(
+          (data) => data.race_date === label
+        );
+        return dataPoint ? dataPoint.official_rating : null;
+      }),
+      pointBackgroundColor: "rgb(0, 0, 0)", // Black dots
+      pointBorderColor: "rgb(0, 0, 0)", // Black border for dots
+      borderColor: "rgb(0, 0, 0)", // Black line
+      backgroundColor: "rgba(0, 0, 0, 0.1)", // Very light black for area under the line
+      spanGaps: true,
+      pointRadius: 3, // Much smaller points
+      pointHoverRadius: 4, // Slightly larger on hover, but still small
+      borderDash: [5, 5], // Dashed line
+      borderWidth: 2,
+    },
+    {
       label: `Rating`,
       data: labels.map((label) => {
         const dataPoint = selectedHorse.performance_data.find(
