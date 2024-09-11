@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { useFetch } from "../../hooks/useFetch";
@@ -8,88 +8,80 @@ import { TodaysRaceTimes } from "../../components/TodaysRaces";
 
 export function FeedBackRaces() {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [visibleCourses, setVisibleCourses] = useState({});
+  const [formattedDate, setFormattedDate] = useState(null);
+  const [feedbackData, setFeedbackData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const {
     data: currentDateData,
     error: currentDateError,
     loading: currentDateLoading,
-  } = useFetch("/feedback/todays-races/current-date", {});
+  } = useFetch("/feedback/todays-races/current-date");
+
+  const { postData } = usePost("/feedback/todays-races/selected-date", {});
+
+  const fetchFeedbackData = useCallback(async (date) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/feedback/todays-races/by-date?date=${date}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch feedback data");
+      }
+      const data = await response.json();
+      setFeedbackData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (currentDateData && !selectedDate) {
-      setSelectedDate(new Date(currentDateData.today_date));
+    if (currentDateData && isInitialLoad) {
+      const initialDate = new Date(currentDateData.today_date);
+      setSelectedDate(initialDate);
+      const formatted = format(initialDate, "yyyy-MM-dd");
+      setFormattedDate(formatted);
+      fetchFeedbackData(formatted);
+      setIsInitialLoad(false);
     }
-  }, [currentDateData, selectedDate]);
+  }, [currentDateData, fetchFeedbackData, isInitialLoad]);
 
-  const formattedDate = selectedDate
-    ? format(selectedDate, "yyyy-MM-dd")
-    : null;
-  const endpoint = formattedDate
-    ? `/feedback/todays-races/by-date?date=${formattedDate}`
-    : null;
+  const handleDateChange = useCallback(
+    (date) => {
+      if (date) {
+        const newDate = new Date(date);
+        setSelectedDate(newDate);
+        const formatted = format(newDate, "yyyy-MM-dd");
+        setFormattedDate(formatted);
+        postData({ date: formatted })
+          .then(() => fetchFeedbackData(formatted))
+          .catch((err) => {
+            console.error("Error posting data:", err);
+            setError("Failed to update selected date");
+          });
+      } else {
+        setSelectedDate(null);
+        setFormattedDate(null);
+      }
+    },
+    [postData, fetchFeedbackData]
+  );
 
-  const {
-    data: feedbackData,
-    error: feedbackDataError,
-    loading: feedbackDataLoading,
-  } = useFetch(endpoint, { dependencies: [endpoint] });
-
-  const {
-    data: postResponse,
-    error: postError,
-    loading: postLoading,
-    postData,
-  } = usePost("/feedback/todays-races/selected-date", {});
-
-  useEffect(() => {
-    if (feedbackData) {
-      const initialVisibility = {};
-      feedbackData.forEach((raceDay) => {
-        raceDay.courses.forEach((_, courseIndex) => {
-          initialVisibility[courseIndex] = true;
-        });
-      });
-      setVisibleCourses(initialVisibility);
-    }
-  }, [feedbackData]);
-
-  useEffect(() => {
-    if (formattedDate) {
-      postData({ date: formattedDate });
-    }
-  }, [formattedDate]);
-
-  const toggleCourseVisibility = (courseIndex) => {
-    setVisibleCourses((prevState) => ({
-      ...prevState,
-      [courseIndex]: !prevState[courseIndex],
-    }));
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date ? new Date(date) : null);
-  };
-
-  if (
-    currentDateLoading ||
-    (feedbackDataLoading && !formattedDate) ||
-    postLoading
-  ) {
+  if (currentDateLoading || isLoading) {
     return <p>Loading data...</p>;
   }
-  if (currentDateError) {
+  if (currentDateError)
     return <p>Error fetching current date: {currentDateError.message}</p>;
-  }
-  if (feedbackDataError) {
-    return <p>Error fetching data: {feedbackDataError.message}</p>;
-  }
-  if (postError) {
-    return <p>Error posting data: {postError.message}</p>;
-  }
-  if (!selectedDate || !feedbackData) {
+  if (error) return <p>Error: {error}</p>;
+  if (!selectedDate || !feedbackData)
     return <p>No data available. Please select a date.</p>;
-  }
 
   return (
     <div className="container mx-auto p-4">
@@ -100,8 +92,6 @@ export function FeedBackRaces() {
       <TodaysRaceTimes
         todaysRaceDataType="feedback"
         todaysRaceData={feedbackData}
-        visibleCourses={visibleCourses}
-        toggleCourseVisibility={toggleCourseVisibility}
       />
     </div>
   );

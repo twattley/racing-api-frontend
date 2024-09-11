@@ -1,4 +1,6 @@
 import React from "react";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { FaFire } from "react-icons/fa"; // Import fire icon
 
 export function HorseDetails({
   horse,
@@ -75,11 +77,21 @@ export function HorseDetails({
             {horse.todays_betfair_place_sp}
           </span>
           <span
-            className={`bg-gray-200 px-2 py-1 rounded ${
-              !visibleHorses[horse.horse_id] ? "bg-gray-200" : ""
+            className={`px-2 py-1 rounded flex items-center justify-center ${
+              !visibleHorses[horse.horse_id]
+                ? "bg-gray-200"
+                : parseFloat(horse.todays_price_change) < -5
+                ? "bg-orange-400"
+                : parseFloat(horse.todays_price_change) < 0
+                ? "bg-green-200"
+                : parseFloat(horse.todays_price_change) > 5
+                ? "bg-blue-300"
+                : parseFloat(horse.todays_price_change) > 2
+                ? "bg-blue-200"
+                : "bg-gray-200"
             }`}
           >
-            {horse.todays_simulated_price}
+            {horse.todays_price_change}
           </span>
           <span
             className={`bg-green-400 text-black px-2 py-1 rounded ${

@@ -65,14 +65,9 @@ export function FeedbackRaceResult() {
           <table className="min-w-full border-collapse">
             <thead>
               <tr className="bg-gray-800 text-white">
-                <th className="px-4 py-2 text-left">Horse Name</th>
-                <th className="px-4 py-2 text-left">SP</th>
-                <th className="px-4 py-2 text-left">Official Rating</th>
-                <th className="px-4 py-2 text-left">TF Speed</th>
-                <th className="px-4 py-2 text-left">TF Rating</th>
-                <th className="px-4 py-2 text-left">RP Speed</th>
-                <th className="px-4 py-2 text-left">RP Rating</th>
-                {/* Add other columns as needed */}
+                <th className="px-3 py-2 text-left w-1/4">Horse Name</th>
+                <th className="px-1 py-2 text-left w-1/7">SP</th>
+                <th className="px-1 py-2 text-left w-1/8">Distance Beaten</th>
               </tr>
             </thead>
             <tbody>
@@ -80,22 +75,21 @@ export function FeedbackRaceResult() {
                 <React.Fragment key={index}>
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     <td className="px-4 py-2">
-                      <strong>({result.finishing_position})</strong>
-                      {"   "}
+                      <strong>{result.finishing_position}</strong>
+                      {"  -  "}
                       {result.horse_name}
-                      {"   "}({result.total_distance_beaten})
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-1 py-2">
                       <strong>{result.betfair_win_sp}</strong>
                     </td>
-                    <td className="px-4 py-2">{result.official_rating}</td>
-                    <td className="px-4 py-2">{result.tfig}</td>
-                    <td className="px-4 py-2">{result.tfr}</td>
-                    <td className="px-4 py-2">{result.ts}</td>
-                    <td className="px-4 py-2">{result.rpr}</td>
+                    <td className="px-1 py-2">
+                      {result.finishing_position !== 1 && (
+                        <strong>{result.total_distance_beaten}</strong>
+                      )}
+                    </td>
                   </tr>
                   <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                    <td className="px-4 py-2" colSpan={7}>
+                    <td className="px-4 py-2" colSpan={3}>
                       {result.tf_comment}
                     </td>
                   </tr>
