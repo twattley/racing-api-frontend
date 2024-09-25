@@ -1,6 +1,4 @@
 import React from "react";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
-import { FaFire } from "react-icons/fa"; // Import fire icon
 
 export function HorseDetails({
   horse,

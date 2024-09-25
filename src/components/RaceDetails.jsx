@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { HorseDetails } from "./HorseDetails";
 import { PerformanceTable } from "./PerformanceTable";
 import { DutchBetCalculator } from "./DutchBetCalculator";
+import { HorseSelectionPanel } from "./HorseSelectionPanel";
 
 export function RaceDetails({
   data,
@@ -14,6 +15,7 @@ export function RaceDetails({
   const [isAllNotVisible, setIsAllNotVisible] = useState(false);
   const [selectedHorses, setSelectedHorses] = useState([]);
   const [timeToOff, setTimeToOff] = useState("");
+  const [selectedHorsesForBetting, setSelectedHorsesForBetting] = useState([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -82,6 +84,28 @@ export function RaceDetails({
     );
   };
 
+  const handleHorseSelection = (horseId, betType) => {
+    setSelectedHorsesForBetting((prevSelected) => {
+      const existingIndex = prevSelected.findIndex(
+        (h) => h.horse_id === horseId
+      );
+      if (existingIndex > -1) {
+        if (prevSelected[existingIndex].bet_type === betType) {
+          return prevSelected.filter((h) => h.horse_id !== horseId);
+        } else {
+          const updatedSelection = [...prevSelected];
+          updatedSelection[existingIndex] = {
+            ...updatedSelection[existingIndex],
+            bet_type: betType,
+          };
+          return updatedSelection;
+        }
+      } else {
+        return [...prevSelected, { horse_id: horseId, bet_type: betType }];
+      }
+    });
+  };
+
   return (
     <div className="container mx-auto p-4">
       <button
@@ -124,6 +148,14 @@ export function RaceDetails({
       <DutchBetCalculator
         selectedHorses={selectedHorses}
         onRemoveHorse={handleRemoveHorse}
+      />
+
+      <HorseSelectionPanel
+        horses={sortedHorses}
+        selectedHorses={selectedHorsesForBetting}
+        onSelectionChange={handleHorseSelection}
+        raceDate={data.race_date}
+        raceId={data.race_id}
       />
     </div>
   );
