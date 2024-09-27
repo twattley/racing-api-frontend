@@ -1,5 +1,6 @@
 import React from "react";
 import { usePost } from "../hooks/usePost";
+import { useNavigate } from "react-router-dom"; // Add this import
 
 // Generic Button Component
 function GenericButton({ betType, isSelected, onClick, children }) {
@@ -59,6 +60,7 @@ export function HorseSelectionPanel({
   raceId,
 }) {
   const { data, error, loading, postData } = usePost(`/betting/selections`);
+  const navigate = useNavigate(); // Add this line
 
   const submitSelections = async () => {
     const selectionsData = {
@@ -75,7 +77,8 @@ export function HorseSelectionPanel({
     try {
       const result = await postData(selectionsData);
       console.log("Submission result:", result);
-      alert("All selections submitted successfully!");
+      // Navigate to the feedback race result page
+      navigate(`/feedback_race/${raceId}/result`);
     } catch (error) {
       console.error("Error submitting selections:", error);
       alert("There was an error submitting selections. Please try again.");

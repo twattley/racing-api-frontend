@@ -23,6 +23,12 @@ export function NavBar() {
         >
           Feedback
         </NavLink>
+        <NavLink
+          to="/betting"
+          className="text-white font-semibold text-3xl py-2 px-4 rounded-lg hover:text-gray-400"
+        >
+          Betting
+        </NavLink>
       </div>
     </nav>
   );

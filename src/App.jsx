@@ -7,7 +7,7 @@ import { FeedbackRaceWrapper } from "./routes/feedback/FeedbackRaceWrapper";
 import { FeedbackRaceResult } from "./routes/feedback/FeedbackRaceResult";
 import { TodaysRaces } from "./routes/today/TodaysRaces";
 import { TodaysRaceWrapper } from "./routes/today/TodaysRaceWrapper";
-
+import { BettingResults } from "./routes/betting/BettingResults";
 function App() {
   const location = useLocation();
 
@@ -27,6 +27,7 @@ function App() {
         />
         <Route path="/today" element={<TodaysRaces />} />
         <Route path="/todays_race/:race_id" element={<TodaysRaceWrapper />} />
+        <Route path="/betting" element={<BettingResults />} />
       </Routes>
     </div>
   );

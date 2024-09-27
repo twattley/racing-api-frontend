@@ -14,6 +14,9 @@ export function Home() {
       <Link to="/feedback" className={`${button} ${activeButton}`}>
         Feedback
       </Link>
+      <Link to="/betting" className={`${button} ${activeButton}`}>
+        Betting
+      </Link>
     </div>
   );
 }
