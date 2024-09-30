@@ -18,6 +18,7 @@ export function BettingResults() {
     loading: bettingResultsLoading,
   } = useFetch("/betting/selections_analysis");
 
+  console.log(bettingResultsData);
   const [selectedRunners, setSelectedRunners] = useState("all");
 
   const filteredData = useMemo(() => {
@@ -44,6 +45,12 @@ export function BettingResults() {
       <div className="mb-4">
         <h2>Number of Bets: {bettingResultsData?.number_of_bets}</h2>
         <h2>Overall Total: {bettingResultsData?.overall_total.toFixed(2)}</h2>
+        <h2>
+          Session Number of Bets: {bettingResultsData?.session_number_of_bets}
+        </h2>
+        <h2>
+          Session Total: {bettingResultsData?.session_overall_total.toFixed(2)}
+        </h2>
       </div>
       <div className="mb-4">
         <label htmlFor="runners" className="mr-2">
