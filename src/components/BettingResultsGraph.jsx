@@ -65,6 +65,36 @@ const generateChartData = (bettingResultsData) => {
     };
   });
 
+  // Calculate aggregate data
+  const aggregateData = bettingResultsData.reduce((acc, item) => {
+    const existingPoint = acc.find((point) => point.x === item.bet_number);
+    if (existingPoint) {
+      existingPoint.y += item.bet_result;
+    } else {
+      acc.push({ x: item.bet_number, y: item.bet_result });
+    }
+    return acc;
+  }, []);
+
+  // Sort aggregate data and calculate running total
+  aggregateData.sort((a, b) => a.x - b.x);
+  let runningTotal = 0;
+  aggregateData.forEach((point) => {
+    runningTotal += point.y;
+    point.y = runningTotal;
+  });
+
+  // Add aggregate dataset
+  datasets.push({
+    label: "Aggregate",
+    data: aggregateData,
+    borderColor: "rgb(0, 0, 0)", // Black color for aggregate line
+    backgroundColor: "rgb(0, 0, 0)",
+    pointRadius: 3,
+    pointHoverRadius: 5,
+    borderWidth: 3, // Make the aggregate line thicker
+  });
+
   return { datasets };
 };
 
@@ -117,6 +147,12 @@ const ChartOptions = (bettingResultsData) => ({
       callbacks: {
         title: (context) => `Bet Number: ${context[0].parsed.x}`,
         label: (context) => {
+          if (context.dataset.label === "Aggregate") {
+            return [
+              `Aggregate`,
+              `Running Total: ${context.parsed.y.toFixed(2)}`,
+            ];
+          }
           const dataPoint = bettingResultsData.find(
             (item) =>
               item.bet_number === context.parsed.x &&
