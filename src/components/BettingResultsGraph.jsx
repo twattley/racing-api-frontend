@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -36,169 +36,151 @@ const colorPalette = [
   "rgb(0, 128, 0)", // Dark Green
 ];
 
-const generateChartData = (bettingResultsData) => {
-  const bettingTypes = [
-    ...new Set(bettingResultsData.map((item) => item.betting_type)),
-  ];
-
-  const datasets = bettingTypes.map((bettingType, index) => {
-    const filteredData = bettingResultsData
-      .filter((item) => item.betting_type === bettingType)
-      .sort((a, b) => a.bet_number - b.bet_number);
-
-    let runningTotal = 0;
-    const data = filteredData.map((item, idx) => {
-      runningTotal += item.bet_result;
-      return {
-        x: idx + 1, // Use index + 1 as x value instead of bet_number
-        y: runningTotal,
-      };
-    });
-
-    return {
-      label: bettingType,
-      data: data,
-      borderColor: colorPalette[index % colorPalette.length],
-      backgroundColor: colorPalette[index % colorPalette.length],
-      pointRadius: 3,
-      pointHoverRadius: 5,
-    };
-  });
-
-  // Calculate aggregate data
-  const aggregateData = bettingResultsData.reduce((acc, item) => {
-    const existingPoint = acc.find((point) => point.x === item.bet_number);
-    if (existingPoint) {
-      existingPoint.y += item.bet_result;
-    } else {
-      acc.push({ x: item.bet_number, y: item.bet_result });
-    }
-    return acc;
-  }, []);
-
-  // Sort aggregate data and calculate running total
-  aggregateData.sort((a, b) => a.x - b.x);
-  let runningTotal = 0;
-  aggregateData.forEach((point) => {
-    runningTotal += point.y;
-    point.y = runningTotal;
-  });
-
-  // Add aggregate dataset
-  datasets.push({
-    label: "Aggregate",
-    data: aggregateData,
-    borderColor: "rgb(0, 0, 0)", // Black color for aggregate line
-    backgroundColor: "rgb(0, 0, 0)",
-    pointRadius: 3,
-    pointHoverRadius: 5,
-    borderWidth: 3, // Make the aggregate line thicker
-  });
-
-  return { datasets };
-};
-
-const ChartOptions = (bettingResultsData) => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      type: "linear",
-      title: {
-        display: true,
-        text: "Bet Number",
-      },
-    },
-    y: {
-      title: {
-        display: true,
-        text: "Running Total",
-      },
-    },
-  },
-  plugins: {
-    zoom: {
-      zoom: {
-        wheel: {
-          enabled: true,
-        },
-        pinch: {
-          enabled: true,
-        },
-        mode: "xy",
-      },
-      pan: {
-        enabled: true,
-        mode: "xy",
-      },
-    },
-    legend: {
-      position: "top",
-    },
-    title: {
-      display: true,
-      text: "Betting Results Comparison",
-      font: {
-        size: 18,
-        weight: "bold",
-      },
-    },
-    tooltip: {
-      callbacks: {
-        title: (context) => `Bet Number: ${context[0].parsed.x}`,
-        label: (context) => {
-          if (context.dataset.label === "Aggregate") {
-            return [
-              `Aggregate`,
-              `Running Total: ${context.parsed.y.toFixed(2)}`,
-            ];
-          }
-          const dataPoint = bettingResultsData.find(
-            (item) =>
-              item.bet_number === context.parsed.x &&
-              item.running_total === context.parsed.y &&
-              item.betting_type === context.dataset.label
-          );
-          return [
-            `${context.dataset.label}`,
-            `Running Total: ${context.parsed.y.toFixed(2)}`,
-            `Horse: ${dataPoint.horse_name}`,
-            `Date: ${new Date(dataPoint.race_date).toLocaleDateString()}`,
-            `Bet Result: ${dataPoint.bet_result.toFixed(2)}`,
-          ];
-        },
-      },
-    },
-    annotation: {
-      annotations: {
-        line1: {
-          type: "line",
-          yMin: 0,
-          yMax: 0,
-          borderColor: "rgb(0, 0, 0)",
-          borderWidth: 2,
-          borderDash: [6, 6],
-        },
-      },
-    },
-  },
-});
-
 export function BettingResultsGraph({ bettingResultsData }) {
+  const [activeTab, setActiveTab] = useState("aggregate");
   const chartRef = useRef(null);
 
-  const data = generateChartData(bettingResultsData);
-  const options = ChartOptions(bettingResultsData);
+  console.log("1. Component received:", bettingResultsData);
+  console.log("2. bet_type_cum_sum:", bettingResultsData?.bet_type_cum_sum);
 
-  const handleDoubleClick = () => {
-    if (chartRef.current) {
-      chartRef.current.resetZoom();
+  // Debug check
+  if (!bettingResultsData) {
+    console.log("3. No bettingResultsData");
+    return <div>No data received</div>;
+  }
+
+  if (!bettingResultsData.bet_type_cum_sum) {
+    console.log("4. No bet_type_cum_sum");
+    return <div>No betting data available</div>;
+  }
+
+  // Create datasets
+  const datasets = Object.entries(bettingResultsData.bet_type_cum_sum).map(
+    ([betType, values], index) => {
+      console.log(`5. Processing ${betType}:`, values);
+      return {
+        label: betType.replace(/_/g, " ").toUpperCase(),
+        data: values.map((value, idx) => ({
+          x: idx + 1,
+          y: value,
+        })),
+        borderColor:
+          betType === "overall_total"
+            ? "rgb(0, 0, 0)"
+            : colorPalette[index % colorPalette.length],
+        backgroundColor:
+          betType === "overall_total"
+            ? "rgb(0, 0, 0)"
+            : colorPalette[index % colorPalette.length],
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        borderWidth: betType === "overall_total" ? 3 : 1,
+      };
     }
+  );
+
+  console.log("6. Created datasets:", datasets);
+
+  const chartData = {
+    datasets:
+      activeTab === "aggregate"
+        ? datasets.filter(
+            (d) => d.label.replace(/ /g, "_").toLowerCase() === "overall_total"
+          )
+        : datasets.filter(
+            (d) => d.label.replace(/ /g, "_").toLowerCase() !== "overall_total"
+          ),
+  };
+
+  console.log("7. Final chartData:", chartData);
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        type: "linear",
+        title: {
+          display: true,
+          text: "Bet Number",
+        },
+        ticks: {
+          stepSize: 1,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Running Total (£)",
+        },
+      },
+    },
+    plugins: {
+      zoom: {
+        zoom: {
+          wheel: { enabled: true },
+          pinch: { enabled: true },
+          mode: "xy",
+        },
+        pan: {
+          enabled: true,
+          mode: "xy",
+        },
+      },
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text:
+          activeTab === "aggregate"
+            ? "Aggregate Results"
+            : "Individual Betting Types",
+        font: {
+          size: 18,
+          weight: "bold",
+        },
+      },
+      tooltip: {
+        callbacks: {
+          title: (context) => `Bet Number: ${context[0].parsed.x}`,
+          label: (context) => [
+            `${context.dataset.label}`,
+            `Running Total: £${context.parsed.y.toFixed(2)}`,
+          ],
+        },
+      },
+    },
   };
 
   return (
-    <div className="h-[600px]" onDoubleClick={handleDoubleClick}>
-      <Line ref={chartRef} data={data} options={options} />
+    <div className="space-y-4">
+      <div className="flex space-x-2 border-b">
+        <button
+          className={`px-4 py-2 ${
+            activeTab === "aggregate"
+              ? "text-blue-600 border-b-2 border-blue-600 font-medium"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setActiveTab("aggregate")}
+        >
+          Aggregate Results
+        </button>
+        <button
+          className={`px-4 py-2 ${
+            activeTab === "individual"
+              ? "text-blue-600 border-b-2 border-blue-600 font-medium"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setActiveTab("individual")}
+        >
+          Individual Types
+        </button>
+      </div>
+
+      <div className="h-[600px]">
+        <Line ref={chartRef} data={chartData} options={options} />
+      </div>
     </div>
   );
 }

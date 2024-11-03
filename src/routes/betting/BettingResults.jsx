@@ -18,7 +18,12 @@ export function BettingResults() {
     loading: bettingResultsLoading,
   } = useFetch("/betting/selections_analysis");
 
-  console.log(bettingResultsData);
+  console.log("A. Fetch result:", {
+    bettingResultsData,
+    bettingResultsError,
+    bettingResultsLoading,
+  });
+
   const [selectedRunners, setSelectedRunners] = useState("all");
 
   const filteredData = useMemo(() => {
@@ -35,22 +40,36 @@ export function BettingResults() {
     });
   }, [bettingResultsData, selectedRunners]);
 
-  if (bettingResultsLoading) return <div>Loading...</div>;
+  if (bettingResultsLoading) return <div>Loading data...</div>;
   if (bettingResultsError)
     return <div>Error: {bettingResultsError.message}</div>;
+  if (!bettingResultsData) return <div>No data available</div>;
+
+  console.log("B. About to render with data:", bettingResultsData);
+  console.log(
+    "C. bet_type_cum_sum exists?",
+    !!bettingResultsData.bet_type_cum_sum
+  );
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Betting Results</h1>
+      <h2>--------------------------------</h2>
       <div className="mb-4">
+        <h1 className="text-lg font-bold mb-2">Totals</h1>
         <h2>Number of Bets: {bettingResultsData?.number_of_bets}</h2>
         <h2>Overall Total: {bettingResultsData?.overall_total.toFixed(2)}</h2>
+        <h2>ROI: {bettingResultsData?.roi_percentage.toFixed(2)}%</h2>
+        <h2>--------------------------------</h2>
+        <h1 className="text-lg font-bold mb-2">Session Totals</h1>
         <h2>
           Session Number of Bets: {bettingResultsData?.session_number_of_bets}
         </h2>
         <h2>
           Session Total: {bettingResultsData?.session_overall_total.toFixed(2)}
         </h2>
+        <h2>--------------------------------</h2>
+        <h1 className="text-lg font-bold mb-2">Filters</h1>
       </div>
       <div className="mb-4">
         <label htmlFor="runners" className="mr-2">
@@ -70,10 +89,7 @@ export function BettingResults() {
         </select>
       </div>
       {filteredData.length > 0 ? (
-        <BettingResultsGraph
-          bettingResultsData={filteredData}
-          overallTotal={bettingResultsData?.overall_total}
-        />
+        <BettingResultsGraph bettingResultsData={bettingResultsData} />
       ) : (
         <p>No data available for the selected filter.</p>
       )}

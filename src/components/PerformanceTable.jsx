@@ -306,7 +306,12 @@ export function PerformanceTable({
                       className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
                     >
                       <td className="px-4 py-2 pl-8" colSpan={8}>
-                        {performance_data.main_race_comment}
+                        <div className="font-bold mb-2 text-gray-400">
+                          {performance_data.race_title}
+                        </div>
+                        <div>
+                          <i>{performance_data.main_race_comment}</i>
+                        </div>
                       </td>
                     </tr>
                   )}

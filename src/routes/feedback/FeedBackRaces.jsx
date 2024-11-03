@@ -8,7 +8,6 @@ import { TodaysRaceTimes } from "../../components/TodaysRaces";
 
 export function FeedBackRaces() {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [formattedDate, setFormattedDate] = useState(null);
   const [feedbackData, setFeedbackData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,13 +21,11 @@ export function FeedBackRaces() {
 
   const { postData } = usePost("/feedback/todays-races/selected-date", {});
 
-  const fetchFeedbackData = useCallback(async (date) => {
+  const fetchFeedbackData = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL
-        }/feedback/todays-races/by-date?date=${date}`
+        `${import.meta.env.VITE_API_BASE_URL}/feedback/todays-races/by-date`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback data");
@@ -46,9 +43,7 @@ export function FeedBackRaces() {
     if (currentDateData && isInitialLoad) {
       const initialDate = new Date(currentDateData.today_date);
       setSelectedDate(initialDate);
-      const formatted = format(initialDate, "yyyy-MM-dd");
-      setFormattedDate(formatted);
-      fetchFeedbackData(formatted);
+      fetchFeedbackData();
       setIsInitialLoad(false);
     }
   }, [currentDateData, fetchFeedbackData, isInitialLoad]);
@@ -58,17 +53,14 @@ export function FeedBackRaces() {
       if (date) {
         const newDate = new Date(date);
         setSelectedDate(newDate);
-        const formatted = format(newDate, "yyyy-MM-dd");
-        setFormattedDate(formatted);
-        postData({ date: formatted })
-          .then(() => fetchFeedbackData(formatted))
+        postData({ date: newDate })
+          .then(() => fetchFeedbackData())
           .catch((err) => {
             console.error("Error posting data:", err);
             setError("Failed to update selected date");
           });
       } else {
         setSelectedDate(null);
-        setFormattedDate(null);
       }
     },
     [postData, fetchFeedbackData]
